@@ -5,33 +5,29 @@ from bs4 import BeautifulSoup
 import os
 import sys
 
-# Increase maximum recusrion depth
-sys.setrecursionlimit(20000)
-
 def clean_html_and_save_to_file(file_directory,file_name,save_directory):
     try:
         #File location
         file_path = file_directory + file_name
         # Open file and turn into beautiful soup object
         with open(file_path, "r",encoding="utf-8",errors="ignore") as file:
-            soup_object = BeautifulSoup(file)
-        # print(soup_object)
-
-        # Select correct section using class. Then select correct subsection of this class
-        # Comment out as was casuing some scripts to be coorectly selected 
-            # div_section = soup_object.find("td",{"class":"scrtext"})
-            # text_section = div_section.find("pre")
-
+            soup_object = BeautifulSoup(file,"html.parser")
+        # Extract only text from document
         text_section = soup_object.getText()
 
         #  Convert all text to string
         str_text_section = str(text_section)
 
+        # Trim file based on following; ALL SCRIPTS => start and "Back to IMSDb" the end of script
+        start= str_text_section.find("ALL SCRIPTS")
+        finish = str_text_section.find("Back to IMSDb")
+        cleaned_text = str_text_section[start:finish]
+
         # Save text to file
         new_file_name = file_name.replace(".html",".txt") # change file extension
         save_path = save_directory + new_file_name
         new_file = open(save_path,"w")
-        new_file.write(str_text_section)
+        new_file.write(cleaned_text)
 
 
 
@@ -54,10 +50,10 @@ def run_text_cleaner_for_directory(file_directory, save_directory):
 
     print(list_files_to_convert)
     # Run all items through function
-    for file in list_files_to_convert[0:20]:
+    for file in list_files_to_convert:
         try:
             clean_html_and_save_to_file(file_directory,file,save_directory)
-            print(file)
+            # print(file)
         except:
             print("The file %s has failed to convert" % file)
             print(sys.exc_info()[0])
