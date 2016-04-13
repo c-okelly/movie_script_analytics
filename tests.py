@@ -2,14 +2,16 @@ import re
 
 f = open("Data/scripts_text/17-Again.txt", 'r')
 text = f.read()
-# text = text[1000:1100]
+# text = text[900:1500]
 # print(text)
 
-count = len(re.findall("\W+",text))
-print(count)
+# count = len(re.findall("\W+",text))
+# print(count)
 
 lines = text.split('\n')
-
+lines_on_empty = re.split("\n\s+\n", text)
+print(len(lines))
+print(len(lines_on_empty))
 
 # Find empty lines
 # count = 0
