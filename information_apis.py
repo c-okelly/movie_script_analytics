@@ -14,7 +14,8 @@ import re
 
 def imdb_data_call(movie):
 
-    search_movie = movie.replace(" ", "+").replace(":","%3A") # Format move name input
+    search_movie = movie.replace(" ", "+").replace("-", "+").replace(":","%3A") # Format move name input
+    # print(search_movie)
 
     # request url
     url = "http://www.omdbapi.com/?t="+search_movie+"=&plot=short&r=json&tomatoes=true"
