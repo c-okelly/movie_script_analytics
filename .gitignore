@@ -2,4 +2,4 @@
 .~*
 Data/
 Movie-script-parser/
-
+__pycache__/
