@@ -92,6 +92,8 @@ def imdb_data_call(movie):
                          # Rotton tomatoes Data - Avg review
                          "tUserAverage":move_data.get("tomatoUserRating"),
                          "tCriticAverage":move_data.get("tomatoRating"),
+                         # Director meta critic rating
+                         "directorMetaRating":director_score
                          }
 
         return new_move_dict
@@ -103,6 +105,6 @@ def imdb_data_call(movie):
 
 if __name__ == '__main__':
     x =imdb_data_call("Mad Max: Fury Road")
-    x =imdb_data_call("Jungle book")
-    # print(x)
+    y =imdb_data_call("Jungle book")
+    print(x)
 
