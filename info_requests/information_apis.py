@@ -4,10 +4,12 @@
 This file will contain all the functions that are required to fetch the extra data stored on external websites.
 """
 
-import urllib.request as request
 import json
 import re
-from meta_critic_web_scraper import retieve_person_score
+import urllib.request as request
+
+from info_requests.meta_critic_web_scraper import retieve_person_score
+
 
 # Will also have all data required from rotton tomamtoes
 # The imdb database api. Take name of movie and return info from imdb
