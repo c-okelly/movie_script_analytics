@@ -7,8 +7,7 @@ This file will contain all the functions that are required to fetch the extra da
 import urllib.request as request
 import json
 import re
-#import api_keys.py
-from meta_critic_web_scraper import retieve_director_score
+from meta_critic_web_scraper import retieve_person_score
 
 # Will also have all data required from rotton tomamtoes
 # The imdb database api. Take name of movie and return info from imdb
@@ -59,7 +58,7 @@ def imdb_data_call(movie):
         try:
             director_name = move_data.get("Director")
             print(director_name)
-            director_score = retieve_director_score(director_name)
+            director_score = retieve_person_score(director_name)
             print(director_score)
         except:
             print("Failed to find meta critic score for director " + move_data.get("Director"))

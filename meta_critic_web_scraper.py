@@ -10,7 +10,7 @@ import urllib.request as request
 import urllib
 import re
 
-def retieve_director_score(search_name):
+def retieve_person_score(search_name):
 
     # Format search term
     search_name_formated = search_name.lower().replace(" ", "-")
@@ -54,6 +54,6 @@ def retieve_director_score(search_name):
 
 if __name__ == '__main__':
     print("Start")
-    x = retieve_director_score("George Miller")
-    y = retieve_director_score('Wolfgang Reitherman')
+    x = retieve_person_score("George Miller")
+    y = retieve_person_score('Brad Pitt')
     print(x, y)
