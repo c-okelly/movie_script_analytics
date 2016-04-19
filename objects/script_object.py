@@ -38,6 +38,9 @@ def create_script_object_from_name_and_file(script_text_file,file_name):
     # Use imdb call to serach for meta date based on movie name
     meta_data = imdb_data_call(cleand_name)
 
+    # Create script object
+    script_object = Script(script_text_file,meta_data.get("Title"),meta_data.get("imdbID"),meta_data)
+
 
     print(meta_data)
 
