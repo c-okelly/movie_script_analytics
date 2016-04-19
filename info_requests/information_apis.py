@@ -56,14 +56,38 @@ def imdb_data_call(movie):
             except:
                 nominations = 0
 
+        # Seperate out generes
+        try:
+            genres = move_data.get("Genre")
+            genres = genres.replace(",", "").split(" ")
+
+            # Set genres according to number of items given from dict
+            if (len(genres) == 3):
+                genre_1 = genres[0]
+                genre_2 = genres[1]
+                genre_3 = genres[2]
+            elif (len(genres) == 2):
+                genre_1 = genres[0]
+                genre_2 = genres[1]
+                genre_3 = None
+            else:
+                genre_1 = genres
+                genre_2 = None
+                genre_3 = None
+
+            print(genre_1,genre_2,genre_3)
+        except:
+            pass
+
         # Get director score if found.
         try:
             director_name = move_data.get("Director")
-            print(director_name)
+            # print(director_name)
             director_score = retieve_person_score(director_name)
-            print(director_score)
+            # print(director_score)
         except:
             print("Failed to find meta critic score for director " + move_data.get("Director"))
+            director_score = None
 
 
         # Selecte dub dict
@@ -77,7 +101,10 @@ def imdb_data_call(movie):
                          "Metascore":move_data.get("Metascore"),
                          "Rated":move_data.get("Rated"),
                          "Metascore":move_data.get("Metascore"),
-                         "Genre":move_data.get("Genre"),
+                         # Three genre attributes
+                         "Genre1":genre_1,
+                         "Genre2":genre_2,
+                         "Genre3":genre_3,
                          #Formated awards
                          "oscars":oscars,         # oscars,nom_oscars,wins,nominations
                          "nom_oscars":nom_oscars,
