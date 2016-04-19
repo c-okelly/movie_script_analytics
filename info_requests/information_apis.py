@@ -75,7 +75,7 @@ def imdb_data_call(movie):
                 genre_2 = None
                 genre_3 = None
 
-            print(genre_1,genre_2,genre_3)
+            # print(genre_1,genre_2,genre_3)
         except:
             pass
 
