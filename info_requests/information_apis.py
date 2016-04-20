@@ -89,6 +89,14 @@ def imdb_data_call(movie):
             print("Failed to find meta critic score for director " + move_data.get("Director"))
             director_score = None
 
+        # Turn released date into only year
+        try:
+            released = move_data.get("Released").split()
+            release_year = released[2]
+            release_month = released[1]
+        except:
+            pass
+
 
         # Selecte dub dict
         new_move_dict = {"Title":move_data.get("Title"),
@@ -96,11 +104,13 @@ def imdb_data_call(movie):
                          "imdbID":move_data.get("imdbID"),
                          "Title":move_data.get("Title"),
                          "Director":move_data.get("Director"),
-                         "Released":move_data.get("Released"),
                          "imdbRating":move_data.get("imdbRating"),
                          "Metascore":move_data.get("Metascore"),
                          "Rated":move_data.get("Rated"),
                          "Metascore":move_data.get("Metascore"),
+                         # Release information
+                         "release_year":release_year,
+                         "release_month":release_month,
                          # Three genre attributes
                          "Genre1":genre_1,
                          "Genre2":genre_2,
