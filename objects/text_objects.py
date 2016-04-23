@@ -99,26 +99,14 @@ class Discription:
 
 class Scene_change:
 
-    def __init__(self,text,count):
+    def __init__(self,text,count,change_type):
 
         self.text = text
         self.count = count
-        self.scene_change_to_outside = self.__scence_change_type()
+        self.scene_change_to_outside = change_type
 
     def __repr__(self):
         return "Sceane change at " + str(self.count) + "% through the script"
-
-    def __scence_change_type(self):
-
-        # regex to search for secene change
-        if (re.search("EXT.",self.text)):
-            change = 1
-        elif (re.search("INT.",self.text)):
-            change = 0
-        else:
-            change = None
-
-        return change
 
 
 
