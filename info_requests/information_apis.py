@@ -96,11 +96,17 @@ def imdb_data_call(movie):
             release_month = released[1]
         except:
             pass
+        # Convert run time into mins only
+        try:
+            string_time = move_data.get("Runtime")
+            string_time = string_time.split(" ")[0].strip()
+            run_time = int(string_time)
+        except:
+            runtime = move_data.get("Runtime")
 
 
         # Selecte dub dict
         new_move_dict = {"Title":move_data.get("Title"),
-                         "Runtime":move_data.get("Runtime"),
                          "imdbID":move_data.get("imdbID"),
                          "Title":move_data.get("Title"),
                          "Director":move_data.get("Director"),
@@ -108,6 +114,8 @@ def imdb_data_call(movie):
                          "Metascore":move_data.get("Metascore"),
                          "Rated":move_data.get("Rated"),
                          "Metascore":move_data.get("Metascore"),
+                         # Run time
+                         "Runtime":run_time,
                          # Release information
                          "release_year":release_year,
                          "release_month":release_month,
