@@ -9,6 +9,7 @@ This results can then be called by attributes to be put into a csv document
 from text_objects import Speech,Scene_change,Discription
 from information_apis import imdb_data_call
 import re
+import nose2
 
 class MoveDataNotFound(Exception):
 
@@ -26,11 +27,11 @@ class Script:
         self.file_name = movie_file_name
         self.movie_title = self.__return_cleaned_name(movie_file_name)
 
-        # Attempt to fetch omdbapi data using info api
-        # try:
-        #     self.imdb_dict = imdb_data_call(self.movie_title)
-        # except:
-        #     raise MoveDataNotFound(movie_file_name)
+        #Attempt to fetch omdbapi data using info api
+        try:
+            self.imdb_dict = imdb_data_call(self.movie_title)
+        except:
+            raise MoveDataNotFound(movie_file_name)
 
         # Created script info dict
         self.script_info_dict = {}
@@ -43,13 +44,15 @@ class Script:
         # Called array builder functions
         self.__create_object_arrays_from_script()
 
-        # Add data to script_info_dict
-        self.__extract_data_from_movie()
+        # Add data to script_info_dict if imdb date exists
+        if self.imdb_dict != None:
+            self.__extract_data_from_movie()
+
+
 
 
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + "file name => " + self.file_name
-
 
     def __return_cleaned_name(self,dirty_file_name):
 
@@ -66,48 +69,71 @@ class Script:
 
         return cleaned_file_name
 
-
-    # Text text and sort
+    # Create text object
     def __create_object_arrays_from_script(self):
 
-        print("Start")
+        # print("Start")
         text_string = self.script
+        total_words = len(re.findall("\w+",text_string)) # Create count of total words
+        current_word_count = 0      # Create varialbe for currnet word count
 
+        # Generate string list
         string_list = self.__return_text_list_in_sections(text_string)
 
-        test_section = string_list[3:20]
+
+        # Cycle through string list and sort. Call function to create object and add to correct array.
+        for text_section in string_list:
+
+            #Generate percentage count through script
+            current_word_count += (len(re.findall("\w+",text_section)))
+            percentage_count = current_word_count / total_words
+
+            # Check first line to see if its all upper case => scene change => ext
+            if text_section.split("\n")[0].isupper() and (re.search('\s{0,3}EXT\.', text_section)):
+                self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=1)
 
 
-
-        for text in string_list:
-
-            # Check first line to see if its all upper case => scene change ext
-            if text.split("\n")[0].isupper() and (re.search('\s{0,3}EXT\.', text)):
-                x = 1
-            # Check first line to see if its all upper case => scene change int
-            elif (text.split("\n")[0].isupper() and re.search('\s{0,3}INT\.', text)):
-                x = 1
+            # Check first line to see if its all upper case => scene change => int
+            elif (text_section.split("\n")[0].isupper() and re.search('\s{0,3}INT\.', text_section)):
+                self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=0)
 
             # Check first line to see if its all upper case And that more then one line => character speech
-            elif text.split("\n")[0].isupper() and text.count("\n") > 1:
-                x = 1
-            # Check if character name follows by item in brackets
-            elif re.search("\A\s*[A-Z]*?\s*(\(.*\))?\s*\Z",text.split("\n")[0]):
-                print(text)
+            elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1:
+                self.__add_speech_ob_to_array(text_section,percentage_count)
+                # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
+
+            # Check if character name follows by item in brackets => character speech
+            elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]):
+                self.__add_speech_ob_to_array(text_section,percentage_count)
 
             # # Description section / others
             else:
                 # If section is more the 70% whitespace discard it
-                if (text.count(" ") > (len(text) * 0.7)):
+                if (text_section.count(" ") > (len(text_section) * 0.7)):
+                    # print(text_section, "Discarded")
                     pass
+
                 # Normal discription section
                 else:
-                    print(text)
+                    self.__add_discription_ob_to_array(text_section,percentage_count)
 
-        # for i in test_section:
-        #     print(i)
+    def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
-        return 1
+        scene_object = Scene_change(text,count,change_to_outside)
+        self.__scene_object_array.append(scene_object)
+        # print(text,"added to scene_change \n")
+
+    def __add_speech_ob_to_array(self,text,count):
+
+        speech_object = Speech(text,count)
+        self.__speech_object_array.append(speech_object)
+        # print(text, speech_object.character,"added to speed\n")
+
+    def __add_discription_ob_to_array(self,text,count):
+
+        discription_object = Discription(text,count)
+        self.__description_object_array.append(discription_object)
+        # print(text,"added to discription\n")
 
     def __return_text_list_in_sections(self,text_file):
 
@@ -137,19 +163,78 @@ class Script:
 
         return no_empty_list_item
 
-
+    # Extract date from moive
     def __extract_data_from_movie(self):
 
-        return 1
+        # Words counts
+        total_words = len(re.findall("\w+",self.script))
+        no_speech_words = len(re.findall("\w+",self.return_string_of_all_speech()))
+        no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
+
+        # Words per a minute
+        gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
+        speech_words_per_min = no_speech_words / self.imdb_dict.get("Runtime")
+        disciription_words_per_min = no_discritption_words / self.imdb_dict.get("Runtime")
+        print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
+
+        # Generate character list
+
+        # Character info
+        no_characters = 0
+        no_characters_speak_more_then_5_perent = 0
+        no_characters_more_20_percent = 0
+        average_character_sentiment = 0
+        no_characters_overall_positive = 0
+        no_characters_overall_negative = 0
+        no_characters_overall_neutral = 0
+
+        # Analysis of sentiment throughout the movie
+
+        # Averages of speech words in different sections
+
+        # Types of words used in the movie => vocab /
+
+        # Catagories of language used => adverbs / adjectives
+
 
     def update_imdb_dict(self,new_search_name):
         try:
             self.imdb_dict = imdb_data_call(new_search_name)
+            self.__extract_data_from_movie()
         except:
             raise MoveDataNotFound(new_search_name)
 
         return 1
 
+    def return_string_of_all_speech(self):
+
+        speech_string = ""
+        for speech_ob in self.__speech_object_array:
+            speech_string += speech_ob.text
+            print(speech_string)
+        return speech_string
+
+    def return_string_all_discription(self):
+
+        discription_string = ""
+        for discrip_ob in self.__description_object_array:
+            discription_string += discrip_ob.text
+        return discription_string
+
+    def return_string_all_scene_changes(self):
+
+        scene_string = ""
+        for scene_ob in self.__scene_object_array:
+            scene_string += scene_ob.text
+        return scene_string
+
+    # Checks that at least 95 % of words make it into the object arrays.
+    def test_words_all_there(self):
+        total_words = len(re.findall("\w+",self.script))
+        no_speech_words = len(re.findall("\w+",self.return_string_of_all_speech()))
+        no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
+        no_scene_words = len(re.findall("\w+",self.return_string_all_scene_changes()))
+        assert total_words > (no_speech_words+ no_discritption_words+ no_scene_words) * 0.9
 
 if __name__ == '__main__':
     with open("../Data/scripts_text/Abyss,-The.txt") as file:
@@ -157,4 +242,5 @@ if __name__ == '__main__':
 
     test_script = Script(text_file,"Abyss,-The.txt")
 
-    # print(test_script)
+    print(test_script)
+    print(test_script.imdb_dict)
