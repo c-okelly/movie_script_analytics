@@ -14,17 +14,17 @@ print(len(lines))
 print(len(lines_on_empty))
 
 # Find empty lines
-# count = 0
-# for item in lines:
-#     if re.search("\A\s+\Z", item):
-#         print(count)
-#     count += 1
+count = 0
+for item in lines:
+    if re.search("\A\s+\Z", item):
+        print(count)
+    count += 1
 
 # Search for character names in list
-# for item in lines:
-#     if re.search("\A\s*Name_character\s*(\(.*\))?\s*\Z", item):
-#         print(item)
-#
+for item in lines:
+    if re.search("\A\s*Name_character\s*(\(.*\))?\s*\Z", item):
+        print(item)
+
 # # Generate list of characters from the script
 # characters = dict()
 #

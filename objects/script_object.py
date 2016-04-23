@@ -71,39 +71,72 @@ class Script:
     def __create_object_arrays_from_script(self):
 
         print("Start")
-        worked_text_file = self.script
-        # print(worked_text_file)
+        text_string = self.script
+
+        string_list = self.__return_text_list_in_sections(text_string)
+
+        test_section = string_list[3:20]
+
+
+
+        for text in string_list:
+
+            # Check first line to see if its all upper case => scene change ext
+            if text.split("\n")[0].isupper() and (re.search('\s{0,3}EXT\.', text)):
+                x = 1
+            # Check first line to see if its all upper case => scene change int
+            elif (text.split("\n")[0].isupper() and re.search('\s{0,3}INT\.', text)):
+                x = 1
+
+            # Check first line to see if its all upper case And that more then one line => character speech
+            elif text.split("\n")[0].isupper() and text.count("\n") > 1:
+                x = 1
+            # Check if character name follows by item in brackets
+            elif re.search("\A\s*[A-Z]*?\s*(\(.*\))?\s*\Z",text.split("\n")[0]):
+                print(text)
+
+            # # Description section / others
+            else:
+                # If section is more the 70% whitespace discard it
+                if (text.count(" ") > (len(text) * 0.7)):
+                    pass
+                # Normal discription section
+                else:
+                    print(text)
+
+        # for i in test_section:
+        #     print(i)
+
+        return 1
+
+    def __return_text_list_in_sections(self,text_file):
 
         # Split text on lines break
-        split_on_empty_line = re.split("\n", worked_text_file)
+        split_on_empty_line = re.split("\n", text_file)
         split_on_empty_line.append("") # Add empty item to end of list
 
         # Cycle through item in list. If line has content add to new string.
         # If line empty append new string to list and reset new string.
-        # Will break section up on empty line breaks
+        # Will break section up on empty line breaks. This can def be done better but I care not.
 
-        new_string = ""
-        new_contents_list = []
+        new_sections_list = []
+        temp_section_stirng = ""
+
         for line in split_on_empty_line:
             if len(line) > 0:
-                new_string += line + "\n"
+                temp_section_stirng += line + "\n"
             else:
-                new_contents_list.append(new_string)
-                new_string = ""
+                new_sections_list.append(temp_section_stirng)
+                temp_section_stirng = ""
 
-        for item in new_contents_list:
-            print(item)
-            print("break", len(item))
+        # Remove items that have a length of 0
+        no_empty_list_item = []
+        for section in new_sections_list:
+            if (len(section) != 0):
+                no_empty_list_item.append(section)
 
+        return no_empty_list_item
 
-        test = split_on_empty_line[5:20]
-        # for i in test:
-        #     print(i)
-
-
-
-
-        return 1
 
     def __extract_data_from_movie(self):
 
