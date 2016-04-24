@@ -41,6 +41,7 @@ for item in lines:
 #         # Select correct lines and strip out and elements within parathenses. Normally continued
 #         if (not(s1 or s2)):
 #             line = re.sub("\s*\(.*\)","",line)
+
 #             # If character no in dict add them. If a already in increase count by 1
 #             if line in characters:
 #                 characters[line] = characters[line] + 1

@@ -50,9 +50,6 @@ class Script:
         if self.imdb_dict != None:
             self.__extract_data_from_movie()
 
-
-
-
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + " file name => " + self.file_name
 
@@ -86,7 +83,7 @@ class Script:
         # Cycle through string list and sort. Call function to create object and add to correct array.
         for text_section in string_list:
 
-            #Generate percentage count through script
+            # Generate percentage count through script
             current_word_count += (len(re.findall("\w+",text_section)))
             percentage_count = current_word_count / total_words
 
@@ -101,10 +98,10 @@ class Script:
 
 
             # Check first line to see if its all upper case And that more then one line => character speech
-            elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1:
+            # Mark as discriptiong if more then 5 words without and / to seperate them
+            elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5:
                 self.__add_speech_ob_to_array(text_section,percentage_count)
                 # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
-
 
             # Check if character name follows by item in brackets => character speech
             elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]):
@@ -120,7 +117,6 @@ class Script:
                 # Normal discription section
                 else:
                     self.__add_discription_ob_to_array(text_section,percentage_count)
-
 
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
@@ -175,6 +171,8 @@ class Script:
         total_words = len(re.findall("\w+",self.script))
         no_speech_words = len(re.findall("\w+",self.return_string_of_all_speech()))
         no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
+        precent_of_speech = no_speech_words / total_words
+        precent_of_discription = no_discritption_words / total_words
 
         # Words per a minute
         gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
@@ -183,10 +181,10 @@ class Script:
         # print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
 
         # Generate character list
-        character_dict = self.generate_dict_of_characters()
+        character_dict = self.__generate_dict_of_characters()
 
         # Character info
-        no_characters = 0
+        no_characters = 0 # Must speak twice to avoid noise
         no_characters_speak_more_then_5_perent = 0
         no_characters_more_20_percent = 0
         average_character_sentiment = 0
@@ -246,7 +244,7 @@ class Script:
             scene_string += scene_ob.text
         return scene_string
 
-    def generate_dict_of_characters(self):
+    def __generate_dict_of_characters(self):
         characters_dict = {}
 
         for speech_ob in self.__speech_object_array:
@@ -270,8 +268,18 @@ class Script:
         sorted_character_list = sorted(character_list, key=lambda x:x[1],reverse=True)
         print(sorted_character_list)
 
+        string = self.__get_string_character_speech("PILOT")
+        print(string)
 
 
+    def __get_string_character_speech(self,search_name):
+
+        return_string = ""
+        for object in self.__speech_object_array:
+            if object.character == search_name.upper():
+                return_string += object.text
+
+        return return_string
 
 
     # This will attempt to capture the level of error that has occoured
@@ -282,17 +290,21 @@ class Script:
         no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
         no_scene_words = len(re.findall("\w+",self.return_string_all_scene_changes()))
         words_captured = (no_speech_words+ no_discritption_words+ no_scene_words) / total_words
-        # No Characters with less then 1 speaking part as percentage of whole => possilbe mis name if high
+
+        # No Characters with less then 1 speaking part as percentage of whole => possible mis name if high
+
+        # Amount of script capture by main characters
+
 
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/Assassins.txt") as file:
+    with open("../Data/scripts_text/Avengers,-The.txt") as file:
         text_file = file.read()
 
     test_script = Script(text_file,"Avengers,-The.txt")
 
     print(test_script)
-    print(test_script.imdb_dict)
-    print(test_script.generate_error_report())
+    # print(test_script.imdb_dict)
+    # print(test_script.generate_error_report())
 
