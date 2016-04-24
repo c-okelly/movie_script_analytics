@@ -34,8 +34,6 @@ class Speech:
         try:
             # Test if only bracket word on first line and save as contextual speech section
             context_name = re.search("^\s*\(\w+(\s\w+){0,1}\)\s*$" ,text.split("\n")[0]).group()
-
-            print(context_name.strip())
             character_name = "Context name"
             self.errors_in_processing = 0
         except:
