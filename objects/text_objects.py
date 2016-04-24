@@ -11,6 +11,9 @@ class Speech:
 
         self.text = text
         self.count = count
+        # Error message if character names can't be found
+        self.errors_in_processing = 0
+        self.error_message = ""
         # Set together
         self.character = self.__return_character_name()
         self.multiple_characters = self.__check_multiple_characters()
@@ -29,11 +32,25 @@ class Speech:
 
         # Regex to pull out character name
         try:
-            character_name = re.search("\s\w{2,}(/\w{2,}){0,}\s",text).group().strip()
+            # Test if only bracket word on first line and save as contextual speech section
+            context_name = re.search("^\s*\(\w+(\s\w+){0,1}\)\s*$" ,text.split("\n")[0]).group()
+
+            print(context_name.strip())
+            character_name = "Context name"
+            self.errors_in_processing = 0
         except:
-            character_name = "Unknown"
-            print("Character name could not be found from text " + text)
-            pass
+            # If name is not context name
+            try:
+                character_name = re.search("\s\w{2,}(\s\w{2,}){0,1}(/\w{2,}){0,}\s",text).group().strip()
+                self.errors_in_processing = 0
+            except:
+                character_name = "Unknown"
+                errors_in_processing = 1
+                error_message = ("Character name could not be found from text " + text)
+                pass
+
+        # Convert all names to uppercase
+        character_name = character_name.upper()
 
         return character_name
 
