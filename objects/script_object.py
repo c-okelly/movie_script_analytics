@@ -274,22 +274,25 @@ class Script:
 
 
 
-    # Checks that at least 95 % of words make it into the object arrays.
-    def test_words_all_there(self):
+    # This will attempt to capture the level of error that has occoured
+    def generate_error_report(self):
+        # Checks that at least 95 % of words make it into the object arrays.
         total_words = len(re.findall("\w+",self.script))
         no_speech_words = len(re.findall("\w+",self.return_string_of_all_speech()))
         no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
         no_scene_words = len(re.findall("\w+",self.return_string_all_scene_changes()))
-        return total_words > (no_speech_words+ no_discritption_words+ no_scene_words) * 0.9
+        words_captured = (no_speech_words+ no_discritption_words+ no_scene_words) / total_words
+        # No Characters with less then 1 speaking part as percentage of whole => possilbe mis name if high
+
+        return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/Avengers,-The.txt") as file:
+    with open("../Data/scripts_text/Assassins.txt") as file:
         text_file = file.read()
 
     test_script = Script(text_file,"Avengers,-The.txt")
 
     print(test_script)
     print(test_script.imdb_dict)
-    print(test_script.test_words_all_there())
+    print(test_script.generate_error_report())
 
-    print(len([['REMEMBER', 1], ['THE HULK', 1], ['WHERE DID', 1], ['WEASELLY THUG', 1], ['OLD MAN', 1], ['SON OF', 1], ['AND KNOCKS', 1], ['GUESS', 1], ['WE GOT', 1], ['INTERCUTS', 1], ['WHAT ARE', 1], ['HOW DID', 1], ['FLYING', 1], ['DID', 1], ['YOU', 1], ['YOUNG SHIELD', 1], ['THOR CHARGES', 1], ['TARGET', 1], ['SHOOTS THROUGH', 1], ['MONTAGE', 1], ['CLOUD OF', 1], ['JULES', 1], ['WE', 1], ['THE COMPUTER', 1], ['ROGER', 1], ['THE GRENADE', 1], ['GALAGA PLAYER', 1], ['AM', 1], ['TELL', 1], ['PEGGY', 1], ['TONY STEVE', 1], ['SENATOR BOYNTON', 1], ['IT WOULD', 1], ['THOR LEAPS', 1], ['SHIELD AGENT', 1], ['SCRIPTS', 1], ['GOT', 1], ['AN IMPRESSIVE', 1], ['MISSED YOU', 1], ['FLY YOU', 1], ['RAISE THE', 1], ['STOP LYING', 1], ['SOON AS', 1], ['SMASHING INTO', 1], ['YOU LET', 1], ['STEVE TONY', 1], ['PEPPER POTTS', 1], ['CONTROL', 1], ['LIFT FANS', 1], ['SHIELD BASE', 1], ['BANNER SUDDENLY', 1], ['HOW MANY', 1], ['WE WERE', 1], ['PILOT', 1], ['GOLD', 1], ['MIGHTY', 1], ['KNOCKS HIM', 1], ['SHOCKWAVE THAT', 1], ['DIRECTOR', 1], ['LEVIATHAN IN', 1], ['THOR BACKHANDS', 1], ['TONY LOOKS', 1], ['YOU MAY', 1], ['HE ATTACKS', 1], ['NO HARD', 1], ['YOU BROUGHT', 1], ['THANK YOU', 1], ['THIS', 1], ['THE MASSIVE', 1], ['BUT', 1], ['BEFORE', 1], ['BANNER LOOKS', 1], ['CUT', 1], ['FURY FIRES', 1], ['HE MADE', 1], ['INSIDE THE', 1], ['ON', 1], ['WHAT DO', 1], ['WAITRESS', 1], ['BANNER IS', 1], ['TONY AND', 1], ['HULK', 1], ['SAVE THE', 1], ['ARE YOU', 1], ['THE END', 1], ['HE LOOKS', 1], ['AN', 1], ['IRON', 1], ['HE DIVES', 1], ['BREAKS OFF', 1], ['LOKI MEANS', 1], ['HOW DOES', 1], ['THIS IS', 1], ['NATASHA BANNER', 1], ['HE HAS', 1], ['ALWAYS', 1], ['IT GOES', 1], ['THEY NEED', 1], ['TAKES US', 1], ['YOU WANT', 1], ['ATTENDING WOMAN', 1], ['THE STARK', 1], ['NASA SCIENTIST', 1], ['SPIKING', 1]]))
