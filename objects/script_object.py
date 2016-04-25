@@ -271,7 +271,9 @@ class Script:
         string = self.__get_string_character_speech("PILOT")
         print(string)
 
+    def __get_string_character_speech(self,search_name):
 
+<<<<<<< HEAD
     def __get_string_character_speech(self,search_name):
 
         return_string = ""
@@ -280,6 +282,12 @@ class Script:
                 return_string += object.text
 
         return return_string
+=======
+        return_string = ""
+        for object in self.__speech_object_array:
+            if object.character == search_name.uper():
+                return_string += object.text
+>>>>>>> 7b775af98911f7467f555f610fb259137d01c8d4
 
 
     # This will attempt to capture the level of error that has occoured
