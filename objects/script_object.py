@@ -260,6 +260,8 @@ class Script:
 
     def __add_extra_info_to_characters_dict(self,characters_dict):
 
+        # Return characters dict with extra information in it
+
         character_list = []
         # Create list of characters that are in the movie
         for character in characters_dict:
@@ -271,23 +273,35 @@ class Script:
         string = self.__get_string_character_speech("PILOT")
         print(string)
 
-    def __get_string_character_speech(self,search_name):
+    def __get_chracter_info_by_name(self,seach_name):
 
-<<<<<<< HEAD
+        # Usd as builder for __add_extra_info_to_characters_dict
+
+        sentiment = 0
+        count = 0
+        word_count = 0
+        for object in self.__speech_object_array:
+            if object.character == seach_name.upper():
+                count += 1
+                sentiment += object.sentimnet
+                word_count += object.no_words
+
+        average_sentiment = sentiment / count
+        # Greate return dict
+        info_dict = {"word_count": word_count, "sentiment": average_sentiment}
+
+        return info_dict
+
     def __get_string_character_speech(self,search_name):
 
         return_string = ""
         for object in self.__speech_object_array:
+            print(object.text)
             if object.character == search_name.upper():
-                return_string += object.text
+                return_string += object.cleaned_text
 
         return return_string
-=======
-        return_string = ""
-        for object in self.__speech_object_array:
-            if object.character == search_name.uper():
-                return_string += object.text
->>>>>>> 7b775af98911f7467f555f610fb259137d01c8d4
+
 
 
     # This will attempt to capture the level of error that has occoured
