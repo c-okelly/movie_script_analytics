@@ -9,6 +9,8 @@ class Speech:
 
     def __init__(self,text,count):
 
+        ## Should add average length of line
+
         self.text = text
         self.count = count
         # Error message if character names can't be found
