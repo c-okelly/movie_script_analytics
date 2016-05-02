@@ -54,6 +54,6 @@ def retieve_person_score(search_name):
 
 if __name__ == '__main__':
     print("Start")
-    x = retieve_person_score("George Miller")
-    y = retieve_person_score('Brad Pitt')
+    x = retieve_person_score("Robert Downey Jr")
+    y = retieve_person_score('Scarlett Johansson')
     print(x, y)

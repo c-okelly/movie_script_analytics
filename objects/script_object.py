@@ -45,10 +45,12 @@ class Script:
         # Called array builder functions
         self.__create_object_arrays_from_script()
 
-        # Add data to script_info_dict if imdb date exists
+        # Add data to script_info_dict if imdb data exists
 
         if self.imdb_dict != None:
             self.__extract_data_from_movie()
+
+        print(len(self.__scene_object_array))
 
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + " file name => " + self.file_name
@@ -247,6 +249,7 @@ class Script:
     def __generate_dict_of_characters(self):
         characters_dict = {}
 
+        # Generate Character name / no parts
         for speech_ob in self.__speech_object_array:
             character_name = speech_ob.character
             if character_name in characters_dict:
@@ -256,9 +259,10 @@ class Script:
 
         updated_dict = self.__add_extra_info_to_characters_dict(characters_dict)
 
+
         return updated_dict
 
-    def __add_extra_info_to_characters_dict(self,characters_dict):
+    def __add_extra_info_to_characters_dict(self,characters_dict): # Information
 
         # Return characters dict with extra information in it
 
@@ -270,8 +274,7 @@ class Script:
         sorted_character_list = sorted(character_list, key=lambda x:x[1],reverse=True)
         print(sorted_character_list)
 
-        string = self.__get_string_character_speech("PILOT")
-        print(string)
+        string = self.__get_string_character_speech("TONY LOOKS")
 
     def __get_chracter_info_by_name(self,seach_name):
 
@@ -296,10 +299,10 @@ class Script:
 
         return_string = ""
         for object in self.__speech_object_array:
-            print(object.text)
+            # print(object.text)
             if object.character == search_name.upper():
                 return_string += object.cleaned_text
-
+        # print(return_string)
         return return_string
 
 
@@ -327,6 +330,6 @@ if __name__ == '__main__':
     test_script = Script(text_file,"Avengers,-The.txt")
 
     print(test_script)
-    # print(test_script.imdb_dict)
+    print(test_script.imdb_dict)
     # print(test_script.generate_error_report())
 
