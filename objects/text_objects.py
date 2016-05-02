@@ -13,6 +13,8 @@ class Speech:
 
         self.text = text
         self.count = count
+        # Percent point in speech - added later once whole script has been processed
+        self.speech_count = 0
         # Error message if character names can't be found
         self.errors_in_processing = 0
         self.error_message = ""
@@ -106,6 +108,10 @@ class Speech:
         cleaned_text = text.replace(self.character,"")
 
         return cleaned_text
+
+    def add_speech_count(self,speech_count_in):
+
+        self.speech_count = speech_count_in
 
 class Discription:
 
