@@ -20,10 +20,10 @@ def imdb_data_call(movie):
     # print(search_movie)
 
     # request url
-    url = "http://www.omdbapi.com/?t="+search_movie+"=&plot=short&r=json&tomatoes=true"
+    request_url = "http://www.omdbapi.com/?t="+search_movie+"=&plot=short&r=json&tomatoes=true"
 
     #Request and get json file
-    current_json_file = request.urlopen(url).read()
+    current_json_file = request.urlopen(request_url).read()
 
     # Error handling if movie not found
 
