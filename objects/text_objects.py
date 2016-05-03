@@ -21,11 +21,14 @@ class Speech:
         # Set together
         self.character = self.__return_character_name()
         self.multiple_characters = self.__check_multiple_characters()
+        # Cleaned text version without character name
+        self.cleaned_text = self.__cleaned_text()
         # Sentiment analysis averaged for section and returned.
         self.sentimnet = self.__sentiment_analytis_text()
         self.no_words = self.__return_no_words()
-        # Cleaned text version without character name
-        self.cleaned_text = self.__cleaned_text()
+        # Extra analysis on text => built incrementally using previous attributes
+        # Average sentence legth
+        self.avg_setenece_length = self.__avg_sentence_legth()
 
     def __repr__(self):
         return "Speech object for character " + self.character + " from " + str(self.count) + "% through the script."
@@ -97,10 +100,10 @@ class Speech:
 
     def __return_no_words(self):
 
-        text = self.text
+        text = self.cleaned_text
         count = len(re.findall("\w+",text))
 
-        return count - 1
+        return count
 
     def __cleaned_text(self):
 
@@ -108,6 +111,25 @@ class Speech:
         cleaned_text = text.replace(self.character,"")
 
         return cleaned_text
+
+    def __avg_sentence_legth(self):
+
+        word_count = self.no_words
+        no_full_stops = len(re.findall("\w(\.)+\s",self.text)) # Looks for full stop with letter in fornt and word after
+        no_question_marks = len(re.findall("\w(\?)+\s",self.text))
+        exclmation_marks = len(re.findall("\w(\!)+\s",self.text))
+        exclmation_and_question = len(re.findall("\w((\!)+(\?)+)+\s",self.text))
+        question_and_exclmation = len(re.findall("\w((\?)+(\!)+)+\s",self.text))
+
+        punctuation_stops = no_full_stops + no_question_marks + exclmation_marks + exclmation_and_question + question_and_exclmation
+
+        if punctuation_stops != 0:
+            self.avg_setenece_length = word_count / punctuation_stops
+            # print(self.text, self.avg_setenece_length)
+        else:
+            self.avg_setenece_length = word_count
+
+        return self.avg_setenece_length
 
     def add_speech_count(self,speech_count_in):
 
@@ -122,11 +144,17 @@ class Discription:
 
 class Scene_change:
 
-    def __init__(self,text,count,change_type):
+    def __init__(self,text,start_count,change_type):
 
         self.text = text
-        self.count = count
+        self.start_count = start_count
         self.scene_change_to_outside = change_type
+
+    # Functions to build information into scene
+    def add_scene_finish_point(self,finish_count):
+
+        self.finish_count = finish_count
+
 
     def __repr__(self):
         return "Sceane change at " + str(self.count) + "% through the script"
@@ -135,10 +163,8 @@ class Scene_change:
 
 if __name__ == '__main__':
 
-    text_ob = Speech("""                              WENDY/James/John
-                    Congratulations, Mike. You deserve
-                    it. You're like a totally amazing
-                    salesman.
-                        """,0.5)
+    text_ob = Speech(""" JAMES/TOM
+            Alright Hey.
+                    """,0.5)
 
-    print(text_ob.multiple_characters)
+    print(text_ob.avg_setenece_length,text_ob.no_words)
