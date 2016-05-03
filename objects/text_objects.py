@@ -120,12 +120,13 @@ class Speech:
         exclmation_marks = len(re.findall("\w(\!)+\s",self.text))
         exclmation_and_question = len(re.findall("\w((\!)+(\?)+)+\s",self.text))
         question_and_exclmation = len(re.findall("\w((\?)+(\!)+)+\s",self.text))
+        cut_off = len(re.findall("\w((\-$)+)+\s",self.text))
 
-        punctuation_stops = no_full_stops + no_question_marks + exclmation_marks + exclmation_and_question + question_and_exclmation
+        punctuation_stops = no_full_stops + no_question_marks + exclmation_marks + exclmation_and_question + question_and_exclmation + cut_off
 
         if punctuation_stops != 0:
             self.avg_setenece_length = word_count / punctuation_stops
-            # print(self.text, self.avg_setenece_length)
+            print(self.text, self.avg_setenece_length)
         else:
             self.avg_setenece_length = word_count
 
