@@ -13,6 +13,7 @@ class Speech:
 
         self.text = text
         self.count = count
+        self.speech_count = 0
         # Percent point in speech - added later once whole script has been processed
         self.speech_count = 0
         # Error message if character names can't be found
@@ -149,6 +150,7 @@ class Scene_change:
 
         self.text = text
         self.start_count = start_count
+        self.finish_count = None
         self.scene_change_to_outside = change_type
 
     # Functions to build information into scene
