@@ -1,8 +1,14 @@
 # Author Conor O'Kelly
 
 """
-This package will create have a main function that takes the argument of an imdb code.
+This package will create have a main function that takes the argument of an imdb code and a character dict
+It will match the character in the movie to an actor using imdb. Then add gender and meta critic rating of actor
+
 This will then read in a csv file containing data for characters
+
+There are two main varialbes on this page that may affect data output.
+    First is the row count no to break on set in scrape_and_format_page_info. This limits the no of cast members in the dict generated
+    Second is the error margin on the regex fuzzy search. This currently allows for up to 15 insertions and 2 substitutions but tries without subs first
 
 """
 
@@ -11,16 +17,27 @@ import urllib.request as request
 import urllib
 import re
 import regex
+import meta_critic_web_scraper
+
+class UrlRequestFailed(Exception):
+    def __init__(self,imdb_code):
+        self.imdb_code = imdb_code
+    def __repr__(self):
+        return "Failed to find OMDBAPI page for the movie / actor code " + self.imdb_code
+
 
 def scrape_and_format_page_info(imdb_code):
 
     # Create request url
-    request_url = "http://www.imdb.com/title/" + imdb_code + "/" #fullcredits?ref_=tt_cl_sm#cast"
+    request_url = "http://www.imdb.com/title/" + imdb_code + "/fullcredits"
 
 
     # Execute request and catch and errors
-    # try:
-    html_page = request.urlopen(request_url).read()
+    try:
+        html_page = request.urlopen(request_url).read()
+    except:
+        raise UrlRequestFailed(imdb_code)
+
     print("Page recieved")
 
     cleaned_html = BeautifulSoup(html_page,"html.parser")
@@ -31,11 +48,13 @@ def scrape_and_format_page_info(imdb_code):
     character_dict = {}
     list_of_characters = []
 
+    row_count = 0
     # Cycle through each row. Extra data and add dic to main character dict. Skip first row.
     for i in range(1,len(only_rows)):
         row = only_rows[i]
-        # Break loop when table row get down to uncredited cast members
-        if len(row) == 1:
+        row_count += 1
+        # Break loop when table row get down to uncredited cast members or after first 20 cast members
+        if len(row) == 1 or row_count > 25:
             break
 
         else:
@@ -84,29 +103,152 @@ def scrape_and_format_page_info(imdb_code):
 
     return character_dict
 
-def add_gender_and_meta_critic_info(character_dict):
-    pass
+def add_gender_and_meta_critic_info(character_dict): # Add extra info to the dicts. Using sqllite db to minimise number of calls
+
+    # To be reformatted in the future to use a database that is built with each new call.
+    # Cut short as ran out of time for this part of the project. Will revisit later.
+
+    # Cycle through each actor in dict
+    for character in character_dict:
+        current_dict = character_dict.get(character)
+
+        current_actor_link_code = current_dict.get("actor_link_code")
+        current_actor_name = current_dict.get("actor_name")
+
+        # Add info to current dict using calls
+        if current_actor_link_code != None:
+            gender = get_gender_from_actor_id(current_actor_link_code)
+        else:
+            gender = None
+
+        if current_actor_name != None:
+            # print(current_actor_name)
+            meta_critic_score = meta_critic_web_scraper.retieve_person_score(current_actor_name)
+        else:
+            meta_critic_score = None
+
+        current_dict["gender"] = gender
+        current_dict["meta_critic_score"] = meta_critic_score
+
+
+    return character_dict
+
+def get_gender_from_actor_id(actor_id):
+
+    # Create request url
+    request_url = "http://www.imdb.com/name/" + actor_id + "/"
+
+    # Execute request and catch and errors
+    try:
+        html_page = request.urlopen(request_url).read()
+    except:
+        raise UrlRequestFailed(actor_id)
+
+    cleaned_html = BeautifulSoup(html_page,"html.parser")
+    actor_info_bar = cleaned_html.find("div", {"class": "infobar"}) # Find correct div and return all info including html
+
+    cleaned_text = actor_info_bar.getText().lower()
+
+    if "actor" in cleaned_text:
+        gender = "M"
+    elif "actress" in cleaned_text:
+        gender = "F"
+    else:
+        gender = None
+
+    return gender
+
+
 def combine_dicts_together(basic_dict,imdb_actor_info_dict):
 
-    # for i in range(0,4):
-    #     name = basic_dict[i][0]
-    #     print(name)
-
-
-
+    # Take the list of character and turn into single string with ! before and after every character.
+    # Had used , but might cause errors later
     character_list = imdb_actor_info_dict.get("list_of_characters")
-    character_string = ",".join(character_list)
-    print(character_string)
+    character_string = "!" + "!".join(character_list) + "!"
 
-    closest_match = regex.search(r",(CLINT){i},",character_string , regex.BESTMATCH).group()
-    print(closest_match)
+    finished_combined_dict = {}
 
-    pass
+    for char_dict in basic_dict:
+
+        # Set name equal to current character name. Use long character string to perform fuzzy regex search.
+        script_character_name = basic_dict.get(char_dict).get("character_name")
+
+        search_object = regex.search(r"!("+script_character_name+"){i<=15}!",character_string , regex.BESTMATCH) # Only insertions
+        # If nothing found allows substitutions
+        if search_object == None:
+            search_object = regex.search(r"!("+script_character_name+"){i<=10,s<=2}!",character_string , regex.BESTMATCH)
+
+        # Try set result string as best match. If failed set as none
+        try:
+            closest_character_match = search_object.group()
+            # Check that no two character names combined
+            if closest_character_match.count("!")<= 2:
+                closest_character_match = closest_character_match.replace("!","")
+            else:
+                print("Doulbe match. Error from extra_character_info_file combine function",closest_character_match,script_character_name)
+                closest_character_match = None
+        except:
+            closest_character_match = None
+
+
+        # print(script_character_name," matched to ",closest_character_match)
+        # print(search_object, "\n")
+
+        basic_dict_copy = basic_dict.get(char_dict)
+        correct_imdb_dict = imdb_actor_info_dict.get(closest_character_match)
+        # print(correct_imdb_dict)
+
+        ###         Add to this section to change what information is combined into the final dict
+        ###
+
+        if correct_imdb_dict != None:
+            # Merge imdb into basic
+            actor_name = correct_imdb_dict.get("actor_name")
+            actor_link_code = correct_imdb_dict.get("actor_link_code")
+            basic_dict_copy["actor_name"] = actor_name
+            basic_dict_copy["actor_link_code"] = actor_link_code
+
+            # No of characters
+            no_chars_in_dict = (len(correct_imdb_dict)-2)/2
+
+            # Find match between closes_character_match and character name. Create variable of character link no
+            for i in range(0,int(no_chars_in_dict)):
+                if closest_character_match == correct_imdb_dict.get("character_name_" + str(i)):
+                    full_character_name = correct_imdb_dict.get("character_name_" + str(i))
+                    basic_dict_copy["full_character_name"] = full_character_name
+                    character_link_no = correct_imdb_dict.get("character_link_" + str(i))
+                    basic_dict_copy["character_link_no"] = character_link_no
+
+        else:
+            basic_dict_copy["actor_name"] = None
+            basic_dict_copy["actor_link_code"] = None
+            basic_dict_copy["character_link_no"] = None
+            basic_dict_copy["full_character_name"] = None
+
+        # Add results to return dict
+        finished_combined_dict[basic_dict_copy.get("character_name")] = basic_dict_copy
+
+
+    return finished_combined_dict
 
 if __name__ == '__main__':
-    character_list = [['TONY', 134], ['NICK FURY', 118], ['BANNER', 80], ['STEVE', 77], ['NATASHA', 74], ['LOKI', 74], ['THOR', 50], ['CONTEXT NAME', 50], ['AGENT PHIL', 46], ['CAPTAIN AMERICA', 43], ['PEPPER', 27], ['IRON MAN', 27], ['CLINT BARTON', 23], ['AGENT MARIA', 22], ['BLACK WIDOW', 20], ['WORLD SECURITY', 18], ['SELVIG', 15], ['JARVIS', 11], ['HAWKEYE', 11], ['SECURITY GUARD', 8], ['THE OTHER', 8], ['LUCHKOV', 6], ['OUTSIDE THE', 3], ['POLICE SERGEANT', 3], ['LITTLE GIRL', 3], ['BARTON', 3], ['SHIELD SCIENTIST', 2], ['ALPHA 11', 2], ['HELMSMAN', 2], ['ELDER GERMAN', 2], ['THE AVENGERS', 2], ['BACK AT', 2], ['YOUNG COP', 2], ['AGENT JASPER', 2], ['THE STARK', 1], ['SHIELD BASE', 1], ['ESCORT 606', 1], ['THE GRENADE', 1], ['HOW MANY', 1], ['INTERCUTS', 1], ['PILOT', 1], ['WAITRESS', 1], ['INSIDE THE', 1], ['STOP LYING', 1], ['TONY LOOKS', 1], ['SMASHING INTO', 1], ['PEGGY', 1], ['IRON', 1], ['TARGET', 1], ['ATTENDING WOMAN', 1], ['MIGHTY', 1], ['YOUNG SHIELD', 1], ['SHIELD AGENT', 1], ['GALAGA PLAYER', 1], ['HE MADE', 1], ['JULES', 1], ['THE END', 1], ['HE LOOKS', 1], ['UNKNOWN', 1], ['IT WOULD', 1], ['FURY FIRES', 1], ['NASA SCIENTIST', 1], ['MONTAGE', 1], ['FLYING', 1], ['WEASELLY THUG', 1], ['CONTROL', 1], ['THOR CHARGES', 1], ['GOLD', 1], ['SOON AS', 1], ['TONY STEVE', 1], ['STEVE TONY', 1], ['CUT', 1], ['FLY YOU', 1], ['NATASHA BANNER', 1], ['HOW DOES', 1], ['SENATOR BOYNTON', 1], ['HULK', 1], ['THIS IS', 1], ['BEFORE', 1], ['PEPPER POTTS', 1], ['OLD MAN', 1], ['SCRIPTS', 1], ['THE', 1]]
+    character_list = [['TONY', 134], ['NICK FURY', 118], ['BANNER', 80], ['STEVE', 77], ['NATASHA', 74], ['LOKI', 74], ['THOR', 50], ['CONTEXT NAME', 50], ['AGENT PHIL', 46], ['CAPTAIN AMERICA', 43], ['PEPPER', 27], ['IRON MAN', 27], ['CLINT BARTON', 23], ['AGENT MARIA', 22], ['BLACK WIDOW', 20], ['WORLD SECURITY', 18], ['SELVIG', 15], ['JARVIS', 11], ['HAWKEYE', 11], ['SECURITY GUARD', 8], ['THE OTHER', 8], ['LUCHKOV', 6], ['OUTSIDE THE', 3], ['POLICE SERGEANT', 3], ['LITTLE GIRL', 3], ['BARTON', 3]]
+    basic_character_dict = {}
+    sub_char_dict = {}
 
-    dict = scrape_and_format_page_info('tt0848228')
-    # new_dict = add_gender_and_meta_critic_info(dict)
-    combine_dicts_together(character_list,dict)
+    for i in character_list:
+        sub_char_dict["character_name"] = i[0]
+        sub_char_dict["no_appearances"] = i[1]
+        basic_character_dict[i[0]] = sub_char_dict
+        sub_char_dict = {}
+
+
+
+    try:
+        scrape_dict = scrape_and_format_page_info('tt0848228')
+        cobimned_dict = combine_dicts_together(basic_character_dict,scrape_dict)
+        finished_dict = add_gender_and_meta_critic_info(cobimned_dict)
+        print(finished_dict)
+    except Exception as e:
+        print(e)
 
