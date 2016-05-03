@@ -38,7 +38,7 @@ def scrape_and_format_page_info(imdb_code):
     except:
         raise UrlRequestFailed(imdb_code)
 
-    print("Page recieved")
+    # print("Page recieved")
 
     cleaned_html = BeautifulSoup(html_page,"html.parser")
     cast_section = cleaned_html.find("table", {"class": "cast_list"}) # Find correct div and return all info including html
@@ -158,7 +158,6 @@ def get_gender_from_actor_id(actor_id):
 
     return gender
 
-
 def combine_dicts_together(basic_dict,imdb_actor_info_dict):
 
     # Take the list of character and turn into single string with ! before and after every character.
@@ -231,6 +230,17 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
 
     return finished_combined_dict
 
+def add_extra_info_to_current_dict(basic_character_dict,imdb_movie_code):
+
+    # Generate scrape dict from moive code
+    imdb_scrape_dict = scrape_and_format_page_info(imdb_movie_code)
+
+    partical_extened_dict = combine_dicts_together(basic_character_dict,imdb_scrape_dict)
+
+    completed_extened_dict = add_gender_and_meta_critic_info(partical_extened_dict)
+
+    return completed_extened_dict
+
 if __name__ == '__main__':
     character_list = [['TONY', 134], ['NICK FURY', 118], ['BANNER', 80], ['STEVE', 77], ['NATASHA', 74], ['LOKI', 74], ['THOR', 50], ['CONTEXT NAME', 50], ['AGENT PHIL', 46], ['CAPTAIN AMERICA', 43], ['PEPPER', 27], ['IRON MAN', 27], ['CLINT BARTON', 23], ['AGENT MARIA', 22], ['BLACK WIDOW', 20], ['WORLD SECURITY', 18], ['SELVIG', 15], ['JARVIS', 11], ['HAWKEYE', 11], ['SECURITY GUARD', 8], ['THE OTHER', 8], ['LUCHKOV', 6], ['OUTSIDE THE', 3], ['POLICE SERGEANT', 3], ['LITTLE GIRL', 3], ['BARTON', 3]]
     basic_character_dict = {}
@@ -245,10 +255,9 @@ if __name__ == '__main__':
 
 
     try:
-        scrape_dict = scrape_and_format_page_info('tt0848228')
-        cobimned_dict = combine_dicts_together(basic_character_dict,scrape_dict)
-        finished_dict = add_gender_and_meta_critic_info(cobimned_dict)
+        finished_dict = add_extra_info_to_current_dict(basic_character_dict,'tt0848228')
         print(finished_dict)
+
     except Exception as e:
         print(e)
 
