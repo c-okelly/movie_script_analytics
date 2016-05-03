@@ -42,15 +42,22 @@ class Script:
         self.__description_object_array = []
         self.__scene_object_array = []
 
-        # Called array builder functions
+        # Call array builder function
         self.__create_object_arrays_from_script()
 
-        # Add data to script_info_dict if imdb data exists
+        # Finish building objects
+        self.__finish_building_objects()
 
+        # Add data to script_info_dict if imdb data exists
         if self.imdb_dict != None:
             self.__extract_data_from_movie()
 
-        print(len(self.__scene_object_array))
+        # Testing
+        # print(len(self.__speech_object_array),len(self.__description_object_array),len(self.__scene_object_array))
+        # for i in self.__speech_object_array:
+        #     print(i.text)
+
+
 
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + " file name => " + self.file_name
@@ -70,7 +77,7 @@ class Script:
 
         return cleaned_file_name
 
-    # Create text object
+    # Main algorithm to sort through through script and create the correct objects from text sections
     def __create_object_arrays_from_script(self):
 
         # print("Start")
@@ -104,6 +111,7 @@ class Script:
             elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5:
                 self.__add_speech_ob_to_array(text_section,percentage_count)
                 # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
+
 
             # Check if character name follows by item in brackets => character speech
             elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]):
@@ -151,8 +159,12 @@ class Script:
         new_sections_list = []
         temp_section_stirng = ""
 
+        # Check the line is not either empty or all white space
         for line in split_on_empty_line:
-            if len(line) > 0:
+            if (re.search("^\s*$",line)): # if line is only white space
+                new_sections_list.append(temp_section_stirng)
+                temp_section_stirng = ""
+            elif len(line) > 0:
                 temp_section_stirng += line + "\n"
             else:
                 new_sections_list.append(temp_section_stirng)
@@ -165,6 +177,11 @@ class Script:
                 no_empty_list_item.append(section)
 
         return no_empty_list_item
+
+    # Finishing building text objects using information collect after running over script once
+
+    def __finish_building_objects(self):
+        pass
 
     # Extract date from moive
     def __extract_data_from_movie(self):
@@ -204,7 +221,7 @@ class Script:
 
         # Catagories of language used => adverbs / adjectives
 
-
+    # Fetch objects in specified range
     def __return_object_of_type_in_range(self,start,finish,type): # Untested!!
 
         if type == "speech":
@@ -325,12 +342,18 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/Avengers,-The.txt") as file:
+    with open("../Data/scripts_text/17-Again.txt") as file:
         text_file = file.read()
 
-    test_script = Script(text_file,"Avengers,-The.txt")
 
-    print(test_script)
-    print(test_script.imdb_dict)
+    # try:
+    test_script = Script(text_file,"17-Again.txt")
+
+    # except Exception as e:
+    #     print(e)
+    #     print("Error")
+
+    # print(test_script)
+    # print(test_script.imdb_dict)
     # print(test_script.generate_error_report())
 
