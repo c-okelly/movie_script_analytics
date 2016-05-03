@@ -55,7 +55,7 @@ class Script:
         # Testing
         # print(len(self.__speech_object_array),len(self.__description_object_array),len(self.__scene_object_array))
         # for i in self.__speech_object_array:
-        #     print(i.text)
+        #     print(i.speech_count)
 
 
 
@@ -188,7 +188,7 @@ class Script:
             no_speech_words += i.no_words
 
         current_speech_count = 0
-        print(no_speech_words,current_speech_count)
+        # print(no_speech_words,current_speech_count)
 
         for speech_ob in self.__speech_object_array:
             # Calculate percent through speech
@@ -201,6 +201,18 @@ class Script:
         # Add finish point of scene using over all text count
         for no_i in range(len(self.__scene_object_array)):
             current_scene_ob = self.__scene_object_array[no_i]
+            # Take next object in array and take start value. Set as end value for current scene object
+            try:
+                next_scene_ob = self.__scene_object_array[no_i+1]
+                current_finish = next_scene_ob.start_count
+                current_scene_ob.add_scene_finish_point(current_finish)
+            except IndexError:
+                # No more object this is the last. Ends at 1
+                current_scene_ob.add_scene_finish_point(1)
+
+
+
+
 
 
 
@@ -251,12 +263,19 @@ class Script:
     # Fetch objects in specified range
     def __return_object_of_type_in_range(self,start,finish,type): # Untested!!
 
-        if type == "speech":
+        object_array = []
+
+        if type == "speech_1": # Measured by general count
+            search_array = self.__speech_object_array
+        elif type == "speech_2": # Measured by speech count
             search_array = self.__speech_object_array
         elif type == "discription":
             search_array = self.__description_object_array
         elif type == "scene":
             search_array = self.__scene_object_array
+
+
+        return
 
 
 
