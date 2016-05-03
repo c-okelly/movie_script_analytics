@@ -257,24 +257,25 @@ class Script:
             else:
                 characters_dict[character_name] = 1
 
-        updated_dict = self.__add_extra_info_to_characters_dict(characters_dict)
+        updated_dict = (characters_dict)
 
 
         return updated_dict
 
-    def __add_extra_info_to_characters_dict(self,characters_dict): # Information
-
-        # Return characters dict with extra information in it
-
-        character_list = []
-        # Create list of characters that are in the movie
-        for character in characters_dict:
-            character_list.append([character, characters_dict[character]])
-        # Sorted list by number of appearances in movie
-        sorted_character_list = sorted(character_list, key=lambda x:x[1],reverse=True)
-        print(sorted_character_list)
-
-        string = self.__get_string_character_speech("TONY LOOKS")
+    # Been removed into an external class as was too much code
+    # def __add_extra_info_to_characters_dict(self,characters_dict): # Information
+    #
+    #     # Return characters dict with extra information in it
+    #
+    #     character_list = []
+    #     # Create list of characters that are in the movie
+    #     for character in characters_dict:
+    #         character_list.append([character, characters_dict[character]])
+    #     # Sorted list by number of appearances in movie
+    #     sorted_character_list = sorted(character_list, key=lambda x:x[1],reverse=True)
+    #     print(sorted_character_list)
+    #
+    #     string = self.__get_string_character_speech("TONY LOOKS")
 
     def __get_chracter_info_by_name(self,seach_name):
 
