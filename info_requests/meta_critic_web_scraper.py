@@ -9,15 +9,27 @@ from bs4 import BeautifulSoup
 import urllib.request as request
 import urllib
 import re
+import unicodedata
+
+class MetaCriticRequestFailed(Exception):
+
+    def __init__(self,actor_name):
+        self.actor_name = actor_name
+    def __repr__(self):
+        return "Failed meta critic request for actor name " + self.actor_name
 
 def retieve_person_score(search_name):
 
     # Format search term
     search_name_formated = search_name.lower().replace(" ", "-")
+    normalise_name = str(unicodedata.normalize('NFKD', search_name_formated).encode('ascii','ignore'))
+    strip_encoding = normalise_name[1:].replace("'","")
+
+
 
     # Create request url
-    request_url = "http://www.metacritic.com/person/" + search_name_formated
-    # print(request_url)
+    request_url = "http://www.metacritic.com/person/" + strip_encoding
+    print(request_url)
 
     # Format request with headers to spoof server
     req = request.Request(
@@ -50,10 +62,12 @@ def retieve_person_score(search_name):
         else:
             print(err.code + "error for search term => " + search_name)
         return 0
+    except:
+        raise MetaCriticRequestFailed(search_name)
 
 
 if __name__ == '__main__':
     print("Start")
-    x = retieve_person_score("Robert Downey Jr")
-    y = retieve_person_score('Scarlett Johansson')
-    print(x, y)
+    x = retieve_person_score("Stellan Skarsgård")
+    # y = retieve_person_score('Scarlett Johansson')
+    print(x)
