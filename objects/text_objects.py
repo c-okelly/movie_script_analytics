@@ -126,7 +126,7 @@ class Speech:
 
         if punctuation_stops != 0:
             self.avg_setenece_length = word_count / punctuation_stops
-            print(self.text, self.avg_setenece_length)
+            # print(self.text, self.avg_setenece_length)
         else:
             self.avg_setenece_length = word_count
 

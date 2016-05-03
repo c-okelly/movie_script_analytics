@@ -181,14 +181,41 @@ class Script:
     # Finishing building text objects using information collect after running over script once
 
     def __finish_building_objects(self):
-        pass
+
+        # Add speech count to each speech object
+        no_speech_words = 0
+        for i in self.__speech_object_array:
+            no_speech_words += i.no_words
+
+        current_speech_count = 0
+        print(no_speech_words,current_speech_count)
+
+        for speech_ob in self.__speech_object_array:
+            # Calculate percent through speech
+            percent_through_speech = current_speech_count / no_speech_words
+            # Set speech count
+            speech_ob.add_speech_count(percent_through_speech)
+            current_speech_count += speech_ob.no_words # Increase word count
+
+        # Scene objects
+        # Add finish point of scene using over all text count
+        for no_i in range(len(self.__scene_object_array)):
+            current_scene_ob = self.__scene_object_array[no_i]
+
+
+
+
 
     # Extract date from moive
     def __extract_data_from_movie(self):
 
         # Words counts
         total_words = len(re.findall("\w+",self.script))
-        no_speech_words = len(re.findall("\w+",self.return_string_of_all_speech()))
+        # Done with loop to be more accurate and remove all names
+        no_speech_words = 0
+        for i in self.__speech_object_array:
+            no_speech_words += i.no_words
+
         no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
         precent_of_speech = no_speech_words / total_words
         precent_of_discription = no_discritption_words / total_words
