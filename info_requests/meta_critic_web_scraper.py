@@ -29,7 +29,7 @@ def retieve_person_score(search_name):
 
     # Create request url
     request_url = "http://www.metacritic.com/person/" + strip_encoding
-    print(request_url)
+    # print(request_url)
 
     # Format request with headers to spoof server
     req = request.Request(
