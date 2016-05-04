@@ -386,7 +386,7 @@ class Script:
         for object in self.__speech_object_array:
             if object.character == seach_name.upper():
                 count += 1
-                sentiment += object.sentimnet
+                sentiment += object.sentiment
                 word_count += object.no_words
 
         average_sentiment = sentiment / count

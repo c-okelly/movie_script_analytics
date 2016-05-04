@@ -20,13 +20,13 @@ class TextBasedSection:
         token_text = tokenize.sent_tokenize(text)
         sid = SentimentIntensityAnalyzer()
 
-        over_all_sentimnet = 0
+        over_all_sentiment = 0
         count = 0
 
         for sentence in token_text:
             score = sid.polarity_scores(sentence)
             # Create over all sentiment score
-            over_all_sentimnet += score.get("compound")
+            over_all_sentiment += score.get("compound")
 
             # If sentence is not neuteral add to sentence count for average
             if (score.get("compound") >  0.1):
@@ -34,9 +34,9 @@ class TextBasedSection:
 
         # Calculate average sentiment
         if count > 0:
-            average_sentiment = over_all_sentimnet/count
+            average_sentiment = over_all_sentiment/count
         else:
-            average_sentiment = over_all_sentimnet
+            average_sentiment = over_all_sentiment
 
         return average_sentiment
 
@@ -59,7 +59,7 @@ class Speech(TextBasedSection):
         # Cleaned text version without character name
         self.cleaned_text = self.__cleaned_text()
         # Sentiment analysis averaged for section and returned.
-        self.sentimnet = self.sentiment_analytis_text(self.cleaned_text)
+        self.sentiment = self.sentiment_analytis_text(self.cleaned_text)
         self.no_words = self.__return_no_words()
         # Extra analysis on text => built incrementally using previous attributes
         # Average sentence legth
@@ -152,7 +152,7 @@ class Discription(TextBasedSection):
         self.no_words = self.__return_no_words()
 
         # Sentiment analysis averaged for section and returned.
-        self.sentimnet = self.sentiment_analytis_text(self.text)
+        self.sentiment = self.sentiment_analytis_text(self.text)
 
     def __return_no_words(self):
 
@@ -222,12 +222,30 @@ class Scene_change:
 
         # List of
         list_of_characters = []
-        characters_in_scene_dict = defaultdict(int)
-        # Cycle through object array and add name if not already in list
+        characters_in_scene_dict = {}
+        # Cycle through object array getting character names and add name if not already in list
+        all_speech_in_scene = total_speech
         for ob in self.speech_object_array:
             character_name = ob.character
+            # Percentage of words in scene
+            no_words = ob.no_words
+            percentage_scene_speech = no_words / all_speech_in_scene
+            section_sentiment = ob.sentiment
 
-            characters_in_scene_dict[character_name] += 1
+            # Check if name in dict. If not add it and add other variables
+            if characters_in_scene_dict.get(character_name):
+                # Find dict in master character dict. Assign to var and then update all values
+                current_sub_dict = characters_in_scene_dict.get(character_name)
+                # Update values
+                current_sub_dict["sections"] += 1
+                current_sub_dict["no_words"] += no_words
+                current_sub_dict["scene_percentage"] += percentage_scene_speech
+                current_sub_dict["sentiment_array"].append(section_sentiment)
+
+            else:
+                # Not in dict. Create new sub dict and add first values in.
+                characters_in_scene_dict[character_name] = {"name":character_name,"sections":1,"no_words":no_words,"scene_percentage":percentage_scene_speech,"sentiment_array":[section_sentiment]}
+
 
         print(characters_in_scene_dict, "\n")
         top_five_characters_in_scene = {}
@@ -294,12 +312,14 @@ if __name__ == '__main__':
                     you.""",0.5)
     spe_1 = Speech("""  SCARLET
                     What took you so long?""",0.5)
+    spe_3 = Speech("""  MIKE
+                    What took you so long?""",0.5)
 
 
     scene = Scene_change(" INT. FITCH SENIOR HIGH SCHOOL/TUNNEL - NIGHT",0.5,0)
 
     scene.add_scene_finish_point(0.6)
-    scene.add_object_array([spe,spe_1,spe_2],[des,des])
+    scene.add_object_array([spe,spe_1,spe_2,spe_3],[des,des])
 
 
 
