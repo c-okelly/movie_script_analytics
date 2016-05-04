@@ -230,73 +230,16 @@ class Scene_change:
 
         ### Dict of characters in scene with data
         characters_in_scene_dict = {}
-        # Cycle through object array getting character names and add name if not already in list
-        all_speech_in_scene = total_speech
-        for ob in self.speech_object_array:
-            character_name = ob.character
-            # Percentage of words in scene
-            no_words = ob.no_words
-            percentage_scene_speech = no_words / all_speech_in_scene
-            section_sentiment = ob.sentiment
-
-            # Check if name in dict. If not add it and add other variables
-            if characters_in_scene_dict.get(character_name):
-                # Find dict in master character dict. Assign to var and then update all values
-                current_sub_dict = characters_in_scene_dict.get(character_name)
-                # Update values
-                current_sub_dict["sections"] += 1
-                current_sub_dict["no_words"] += no_words
-                current_sub_dict["scene_percentage"] += percentage_scene_speech
-                current_sub_dict["sentiment_array"].append(section_sentiment)
-
-            else:
-                # Not in dict. Create new sub dict and add first values in.
-                characters_in_scene_dict[character_name] = {"name":character_name,"sections":1,"no_words":no_words,"scene_percentage":percentage_scene_speech,"sentiment_array":[section_sentiment]}
-
-        # Cycle through dicts and add new variable of averaged sentiment.
-        # Add all variables and divide number of non zero ones.
-        for char_dict in characters_in_scene_dict:
-            current_dict = characters_in_scene_dict.get(char_dict)
-            current_sentiment_array = current_dict.get("sentiment_array")
-            # Add sentiments and get average
-            avg_sentiment = 0
-            no_non_zero_sentiments = 0
-            total_of_sentiments = 0
-            for sentiment_value in current_sentiment_array:
-                if sentiment_value != 0:
-                    no_non_zero_sentiments += 1
-                # Add sentiment values together
-                total_of_sentiments += sentiment_value
-
-            # Get average sentiment and add to current dict. Prevent division by 0
-            if no_non_zero_sentiments == 0:
-                avg_sentiment = 0
-            else:
-                avg_sentiment = total_of_sentiments / no_non_zero_sentiments
-
-            current_dict["average_sentiment"] = avg_sentiment
+        characters_in_scene_dict = self.__generate_character_in_scene_dict(total_speech)
 
         # Test print.
-        # print(characters_in_scene_dict, "\n")
+        print(characters_in_scene_dict, "\n")
 
         ### Find top 10 characters in each scene
         # Cycle through dict. Create array of character_name and % in scene. Sort and take first 5
-        all_chars_array = []
-        for char_dict_name in characters_in_scene_dict:
-            current_dict_1 = characters_in_scene_dict.get(char_dict_name)
-            character_info = [current_dict_1.get("name"), current_dict_1.get("scene_percentage")]
-            all_chars_array.append(character_info)
+        top_ten_characters_in_scene = self.__find_top_10_character(characters_in_scene_dict)
 
-        # Sort character array based on percentage of scene. So highest is first
-        sorted_all_chars_array = sorted(all_chars_array, key=lambda x:x[1],reverse=True)
-
-        # Take top 5 character from each scene if there is more then 10
-        if len(sorted_all_chars_array)> 10:
-            top_ten_characters_in_scene = sorted_all_chars_array[:10]
-        else:
-            top_ten_characters_in_scene = sorted_all_chars_array
-
-        # print(top_ten_characters_in_scene)
+        print(top_ten_characters_in_scene)
 
         ### Sentiment of section
         # For each add all sentiments to array. Exclude 0 elements, take absolute values sum and divide by number left.
@@ -381,6 +324,57 @@ class Scene_change:
             top_ten_characters_in_scene = sorted_all_chars_array
 
         return top_ten_characters_in_scene
+
+    def __generate_character_in_scene_dict(self,all_speech_in_scene):
+
+        ### Dict of characters in scene with data
+        characters_in_scene_dict = {}
+        # Cycle through object array getting character names and add name if not already in list
+        for ob in self.speech_object_array:
+            character_name = ob.character
+            # Percentage of words in scene
+            no_words = ob.no_words
+            percentage_scene_speech = no_words / all_speech_in_scene
+            section_sentiment = ob.sentiment
+
+            # Check if name in dict. If not add it and add other variables
+            if characters_in_scene_dict.get(character_name):
+                # Find dict in master character dict. Assign to var and then update all values
+                current_sub_dict = characters_in_scene_dict.get(character_name)
+                # Update values
+                current_sub_dict["sections"] += 1
+                current_sub_dict["no_words"] += no_words
+                current_sub_dict["scene_percentage"] += percentage_scene_speech
+                current_sub_dict["sentiment_array"].append(section_sentiment)
+
+            else:
+                # Not in dict. Create new sub dict and add first values in.
+                characters_in_scene_dict[character_name] = {"name":character_name,"sections":1,"no_words":no_words,"scene_percentage":percentage_scene_speech,"sentiment_array":[section_sentiment]}
+
+        # Cycle through dicts and add new variable of averaged sentiment.
+        # Add all variables and divide number of non zero ones.
+        for char_dict in characters_in_scene_dict:
+            current_dict = characters_in_scene_dict.get(char_dict)
+            current_sentiment_array = current_dict.get("sentiment_array")
+            # Add sentiments and get average
+            avg_sentiment = 0
+            no_non_zero_sentiments = 0
+            total_of_sentiments = 0
+            for sentiment_value in current_sentiment_array:
+                if sentiment_value != 0:
+                    no_non_zero_sentiments += 1
+                # Add sentiment values together
+                total_of_sentiments += sentiment_value
+
+            # Get average sentiment and add to current dict. Prevent division by 0
+            if no_non_zero_sentiments == 0:
+                avg_sentiment = 0
+            else:
+                avg_sentiment = total_of_sentiments / no_non_zero_sentiments
+
+            current_dict["average_sentiment"] = avg_sentiment
+
+        return characters_in_scene_dict
 
     def count_words_of_type_in_ob_array(self,type_description=0,type_speech=0):
 
