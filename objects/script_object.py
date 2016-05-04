@@ -128,6 +128,97 @@ class Script:
                 else:
                     self.__add_discription_ob_to_array(text_section,percentage_count)
 
+    # Finishing building text objects using information collect after running over script once
+
+    def __finish_building_objects(self):
+
+        # Add speech count to each speech object
+        no_speech_words = 0
+        for i in self.__speech_object_array:
+            no_speech_words += i.no_words
+
+        current_speech_count = 0
+        # print(no_speech_words,current_speech_count)
+
+        for speech_ob in self.__speech_object_array:
+            # Calculate percent through speech
+            percent_through_speech = current_speech_count / no_speech_words
+            # Set speech count
+            speech_ob.add_speech_count(percent_through_speech)
+            current_speech_count += speech_ob.no_words # Increase word count
+
+        ### Scene objects   ###
+
+        # Add finish point of scene using over all text count
+        for no_i in range(len(self.__scene_object_array)):
+            current_scene_ob = self.__scene_object_array[no_i]
+            # Take next object in array and take start value. Set as end value for current scene object
+            try:
+                next_scene_ob = self.__scene_object_array[no_i+1]
+                current_finish = next_scene_ob.start_count
+                current_scene_ob.add_scene_finish_point(current_finish)
+            except IndexError:
+                # No more object this is the last. Ends at 1
+                current_scene_ob.add_scene_finish_point(1)
+
+        # Add object references to scene object array.
+        for scene_ob in self.__scene_object_array:
+            scene_start = scene_ob.start_count
+            scene_finish = scene_ob.finish_count
+            print(scene_start,scene_finish)
+            # Get objects in the specified range and merge into list
+            speech_objects = self.return_object_of_type_in_range(scene_start, scene_finish, speech_normal_count=1)
+            description_objects = self.return_object_of_type_in_range(scene_start, scene_finish, discription=1)
+            all_text_objects_in_scene = speech_objects + description_objects
+            # Add object array to current scene object
+
+
+
+
+
+
+    # Extract date from moive
+    def __extract_data_from_movie(self):
+
+        # Words counts
+        total_words = len(re.findall("\w+",self.script))
+        # Done with loop to be more accurate and remove all names
+        no_speech_words = 0
+        for i in self.__speech_object_array:
+            no_speech_words += i.no_words
+
+        no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
+        precent_of_speech = no_speech_words / total_words
+        precent_of_discription = no_discritption_words / total_words
+
+        # Words per a minute
+        gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
+        speech_words_per_min = no_speech_words / self.imdb_dict.get("Runtime")
+        disciription_words_per_min = no_discritption_words / self.imdb_dict.get("Runtime")
+        # print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
+
+        # Generate character list
+        character_dict = self.__generate_dict_of_characters()
+
+        # Character info
+        no_characters = 0 # Must speak twice to avoid noise
+        no_characters_speak_more_then_5_perent = 0
+        no_characters_more_20_percent = 0
+        average_character_sentiment = 0
+        no_characters_overall_positive = 0
+        no_characters_overall_negative = 0
+        no_characters_overall_neutral = 0
+
+        # Analysis of sentiment throughout the movie
+        overall_sentiment = 0
+
+
+        # Averages of speech words in different sections
+
+        # Types of words used in the movie => vocab /
+
+        # Catagories of language used => adverbs / adjectives
+
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
         scene_object = Scene_change(text,count,change_to_outside)
@@ -178,93 +269,9 @@ class Script:
 
         return no_empty_list_item
 
-    # Finishing building text objects using information collect after running over script once
-
-    def __finish_building_objects(self):
-
-        # Add speech count to each speech object
-        no_speech_words = 0
-        for i in self.__speech_object_array:
-            no_speech_words += i.no_words
-
-        current_speech_count = 0
-        # print(no_speech_words,current_speech_count)
-
-        for speech_ob in self.__speech_object_array:
-            # Calculate percent through speech
-            percent_through_speech = current_speech_count / no_speech_words
-            # Set speech count
-            speech_ob.add_speech_count(percent_through_speech)
-            current_speech_count += speech_ob.no_words # Increase word count
-
-        # Scene objects
-        # Add finish point of scene using over all text count
-        for no_i in range(len(self.__scene_object_array)):
-            current_scene_ob = self.__scene_object_array[no_i]
-            # Take next object in array and take start value. Set as end value for current scene object
-            try:
-                next_scene_ob = self.__scene_object_array[no_i+1]
-                current_finish = next_scene_ob.start_count
-                current_scene_ob.add_scene_finish_point(current_finish)
-            except IndexError:
-                # No more object this is the last. Ends at 1
-                current_scene_ob.add_scene_finish_point(1)
-
-        # Choice of type => set to 1
-        scene_object = self.__return_object_of_type_in_range(0.1,0.3)
-
-        scene_object = self.__return_object_of_type_in_range(0.1,0.15,speech_speech_count=1)
-        print(scene_object)
-
-
-
-
-
-    # Extract date from moive
-    def __extract_data_from_movie(self):
-
-        # Words counts
-        total_words = len(re.findall("\w+",self.script))
-        # Done with loop to be more accurate and remove all names
-        no_speech_words = 0
-        for i in self.__speech_object_array:
-            no_speech_words += i.no_words
-
-        no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
-        precent_of_speech = no_speech_words / total_words
-        precent_of_discription = no_discritption_words / total_words
-
-        # Words per a minute
-        gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
-        speech_words_per_min = no_speech_words / self.imdb_dict.get("Runtime")
-        disciription_words_per_min = no_discritption_words / self.imdb_dict.get("Runtime")
-        # print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
-
-        # Generate character list
-        character_dict = self.__generate_dict_of_characters()
-
-        # Character info
-        no_characters = 0 # Must speak twice to avoid noise
-        no_characters_speak_more_then_5_perent = 0
-        no_characters_more_20_percent = 0
-        average_character_sentiment = 0
-        no_characters_overall_positive = 0
-        no_characters_overall_negative = 0
-        no_characters_overall_neutral = 0
-
-        # Analysis of sentiment throughout the movie
-        overall_sentiment = 0
-
-
-        # Averages of speech words in different sections
-
-        # Types of words used in the movie => vocab /
-
-        # Catagories of language used => adverbs / adjectives
-
     # Fetch objects in specified range. It will return object pointers in a specified range.
     # Four main serach types. To search that array type set one of them equal to 1
-    def __return_object_of_type_in_range(self,start,finish,speech_normal_count=0,speech_speech_count=0,discription=0,scene=0): # Untested!!
+    def return_object_of_type_in_range(self, start, finish, speech_normal_count=0, speech_speech_count=0, discription=0, scene=0): # Untested!!
 
         object_array = []
 
@@ -427,7 +434,7 @@ if __name__ == '__main__':
     #     print(e)
     #     print("Error")
 
-    # print(test_script)
-    # print(test_script.imdb_dict)
-    # print(test_script.generate_error_report())
+    print(test_script)
+    print(test_script.imdb_dict)
+    print(test_script.generate_error_report())
 
