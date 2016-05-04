@@ -144,6 +144,9 @@ class Discription:
         self.text = text
         self.count = count
 
+    def __repr__(self):
+        return "Discription object form " + str(self.count) + "% way through the movie"
+
 class Scene_change:
 
     def __init__(self,text,start_count,change_type):
@@ -153,21 +156,18 @@ class Scene_change:
         self.finish_count = None
         self.scene_change_to_outside = change_type
 
+    def __repr__(self):
+        return "Scene change at " + str(self.start_count) + "% through the script"
+
     # Functions to build information into scene
     def add_scene_finish_point(self,finish_count):
 
         self.finish_count = finish_count
 
 
-    def __repr__(self):
-        return "Sceane change at " + str(self.count) + "% through the script"
-
-
 
 if __name__ == '__main__':
 
-    text_ob = Speech(""" JAMES/TOM
-            Alright Hey.
-                    """,0.5)
+    text_ob = Discription(0.3,0.5)
 
-    print(text_ob.avg_setenece_length,text_ob.no_words)
+    print(text_ob)
