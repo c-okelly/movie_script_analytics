@@ -32,7 +32,7 @@ class Speech:
         self.avg_setenece_length = self.__avg_sentence_legth()
 
     def __repr__(self):
-        return "Speech object for character " + self.character + " from " + str(self.count) + "% through the script."
+        return "Speech object for character " + self.character + ". Abs count = " + str(self.count) + "%. Speech count = " + str(self.speech_count) + "%"
 
     def __return_character_name(self):
 
