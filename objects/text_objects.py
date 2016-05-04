@@ -143,9 +143,38 @@ class Discription:
 
         self.text = text
         self.count = count
+        # Sentiment analysis averaged for section and returned.
+        self.sentimnet = self.__sentiment_analytis_text()
 
     def __repr__(self):
         return "Discription object form " + str(self.count) + "% way through the movie"
+
+    def __sentiment_analytis_text(self):
+
+        text = self.text
+
+        token_text = tokenize.sent_tokenize(text)
+        sid = SentimentIntensityAnalyzer()
+
+        over_all_sentimnet = 0
+        count = 0
+
+        for sentence in token_text:
+            score = sid.polarity_scores(sentence)
+            # Create over all sentiment score
+            over_all_sentimnet += score.get("compound")
+
+            # If sentence is not neuteral add to sentence count for average
+            if (score.get("compound") >  0.1):
+                count += 1
+
+        # Calculate average sentiment
+        if count > 0:
+            average_sentiment = over_all_sentimnet/count
+        else:
+            average_sentiment = over_all_sentimnet
+
+        return average_sentiment
 
 class Scene_change:
 
@@ -168,6 +197,10 @@ class Scene_change:
 
 if __name__ == '__main__':
 
-    text_ob = Discription(0.3,0.5)
+    text_ob = Discription("""  Coach Harvey pulls the Players apart just as the gym doors
+          burst open. ED FREEDMAN, 17, sporting a jacket over a WIZARD
+          costume, runs in, trips on his robe, gets up, peels his
+          clothes off.""",0.5)
 
     print(text_ob)
+    print(text_ob.sentimnet)
