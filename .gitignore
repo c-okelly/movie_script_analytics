@@ -1,5 +1,14 @@
 .DS_Store
 .~*
+
+# Data directory
 Data/
+
+# Tests file
+test.py 
+
+
 Movie-script-parser/
 __pycache__/
+
+
