@@ -160,10 +160,12 @@ class Scene_change:
 
         self.text = text
         self.start_count = start_count
+        # Duplicate attriubte to make scene and speech more homegnous
+        self.count = start_count
         self.scene_change_to_outside = change_type
         # Values assigned using an setter function. Should be set in the following order
         self.finish_count = None
-        self.objects_in_scene = None
+        self.objects_in_scene = []
 
     def __repr__(self):
         return "Scene change at " + str(self.start_count) + "% through the script"
