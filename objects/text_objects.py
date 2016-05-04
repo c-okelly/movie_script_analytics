@@ -40,6 +40,8 @@ class TextBasedSection:
 
         return average_sentiment
 
+    
+
 class Speech(TextBasedSection):
 
     def __init__(self,text,count):
@@ -201,8 +203,8 @@ class Scene_change:
     # Use information to build a dict of information containted in scene.
     def build_data_dict(self):
 
-        # Word analysis
-        # Total / percentages
+        #### Word analysis ####
+        ### Total / percentages
         total_speech = self.count_words_of_type_in_ob_array(type_speech=1)
         total_description = self.count_words_of_type_in_ob_array(type_description=1)
         total_words = total_speech + total_description
@@ -215,18 +217,18 @@ class Scene_change:
 
         # print("s",total_speech,"d",total_description,"t",total_words,"speech ",percent_speech,"descrip ",percent_description)
 
-        # No of sections
+        ### No of sections
         no_speech_sections = len(self.speech_object_array)
         no_description_sections = len(self.description_object_array)
         # print("s",no_speech_sections,"d",no_description_sections)
 
-        # Scene type => mixed / only description - imply cut scene
+        ### Scene type => mixed / only description - imply cut scene
         if no_speech_sections == 0 and no_description_sections > 0:
             scene_only_description = 1
         else:
             scene_only_description = 0
 
-        # Dict of characters in scene with data
+        ### Dict of characters in scene with data
         characters_in_scene_dict = {}
         # Cycle through object array getting character names and add name if not already in list
         all_speech_in_scene = total_speech
@@ -275,9 +277,9 @@ class Scene_change:
             current_dict["average_sentiment"] = avg_sentiment
 
         # Test print.
-        print(characters_in_scene_dict, "\n")
+        # print(characters_in_scene_dict, "\n")
 
-        # Find top 5 characters in each scene
+        ### Find top 10 characters in each scene
         # Cycle through dict. Create array of character_name and % in scene. Sort and take first 5
         all_chars_array = []
         for char_dict_name in characters_in_scene_dict:
@@ -288,17 +290,58 @@ class Scene_change:
         # Sort character array based on percentage of scene. So highest is first
         sorted_all_chars_array = sorted(all_chars_array, key=lambda x:x[1],reverse=True)
 
-        # Take top 5 character from each scene if there is more then 5
-        if len(sorted_all_chars_array)> 5:
-            top_five_characters_in_scene = sorted_all_chars_array[:5]
+        # Take top 5 character from each scene if there is more then 10
+        if len(sorted_all_chars_array)> 10:
+            top_ten_characters_in_scene = sorted_all_chars_array[:10]
         else:
-            top_five_characters_in_scene = sorted_all_chars_array
-        print(top_five_characters_in_scene)
+            top_ten_characters_in_scene = sorted_all_chars_array
 
-        # Sentiment of section
-        speech_sentiment = 0
-        description_sentiment = 0
-        overall_sentiment = 0
+        # print(top_ten_characters_in_scene)
+
+        ### Sentiment of section
+        # For each add all sentiments to array. Exclude 0 elements, take absolute values sum and divide by number left.
+
+        # Speech
+        speech_sentiment_array = []
+        for obj in self.speech_object_array:
+            if abs(obj.sentiment) > 0:
+                speech_sentiment_array.append(obj.sentiment)
+            else:
+                pass
+        # Sum and divide by no left. Set to zero
+        try:
+            speech_sentiment = sum(speech_sentiment_array) / len(speech_sentiment_array)
+        except ZeroDivisionError:
+            speech_sentiment = 0
+
+        # Description
+        description_sentiment_array = []
+        for obj in self.description_object_array:
+            if abs(obj.sentiment) > 0:
+                description_sentiment_array.append(obj.sentiment)
+            else:
+                pass
+
+        try:
+            description_sentiment = sum(description_sentiment_array)/ len(description_sentiment_array)
+        except:
+            description_sentiment = 0
+
+        # print(speech_sentiment,description_sentiment)
+
+        # Overall sentiment
+        overall_sentiment_array = []
+        if abs(speech_sentiment) > 0:
+            overall_sentiment_array.append(speech_sentiment)
+        if abs(description_sentiment) > 0:
+            overall_sentiment_array.append(description_sentiment)
+
+        try:
+            overall_sentiment = sum(overall_sentiment_array)/ len(overall_sentiment_array)
+        except ZeroDivisionError:
+            overall_sentiment = 0
+
+        print(speech_sentiment,description_sentiment,overall_sentiment)
 
         # Scene type => mono / duo / tri / multi
         scene_interaction_type = ""
@@ -345,7 +388,10 @@ class Scene_change:
 if __name__ == '__main__':
 
     des = Discription("""  Coach Harvey pulls the Players apart just as the gym doors
-          burst open.""",0.5)
+          burst open good.""",0.5)
+    des_1 = Discription("""  Coach Harvey pulls the Players apart just as the gym doors
+          burst open bad.""",0.5)
+
     spe = Speech("""  MIKE
                     The best choice I ever made was
                     you.""",0.5)
@@ -358,10 +404,11 @@ if __name__ == '__main__':
                     What took you so long?""",0.5)
 
 
+    # print(des_1.sentiment)
     scene = Scene_change(" INT. FITCH SENIOR HIGH SCHOOL/TUNNEL - NIGHT",0.5,0)
 
     scene.add_scene_finish_point(0.6)
-    scene.add_object_array([spe,spe_1,spe_2,spe_3],[des,des])
+    scene.add_object_array([spe,spe_1,spe_2,spe_3],[des,des_1])
 
 
 

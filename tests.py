@@ -58,22 +58,33 @@ import text_objects
 
 if __name__ == '__main__':
 
-    dog_array = []
+    # dog_array = []
+    #
+    # dog = text_objects.Speech("Hello",0.4)
+    # dog_array.append(dog)
+    # dog = text_objects.Speech("cat",0.5)
+    # dog_array.append(dog)
+    # dog = text_objects.Speech("DOG \n yello",0.6)
+    # dog_array.append(dog)
+    #
+    # for i in dog_array:
+    #     print(i)
+    #
+    # new_array = []
+    #
+    # for i in dog_array:
+    #     if i.count >= 0.5:
+    #         new_array.append(i)
+    #
+    # print(new_array)
 
-    dog = text_objects.Speech("Hello",0.4)
-    dog_array.append(dog)
-    dog = text_objects.Speech("cat",0.5)
-    dog_array.append(dog)
-    dog = text_objects.Speech("DOG \n yello",0.6)
-    dog_array.append(dog)
+    d = {"John":1}
 
-    for i in dog_array:
-        print(i)
+    x = ["John","David","John","James","Silly"]
+    for i in x:
+        if d.get(i):
+            d[i] += 1
+        else:
+            d[i] = 1
 
-    new_array = []
-
-    for i in dog_array:
-        if i.count >= 0.5:
-            new_array.append(i)
-
-    print(new_array)
+    print(d)
