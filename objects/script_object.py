@@ -165,16 +165,17 @@ class Script:
         for scene_ob in self.__scene_object_array:
             scene_start = scene_ob.start_count
             scene_finish = scene_ob.finish_count
-            print(scene_start,scene_finish)
-            # Get objects in the specified range and merge into list
+            # Get objects in the specified range
             speech_objects = self.return_object_of_type_in_range(scene_start, scene_finish, speech_normal_count=1)
             description_objects = self.return_object_of_type_in_range(scene_start, scene_finish, discription=1)
-            all_text_objects_in_scene = speech_objects + description_objects
             # Add object array to current scene object
+            scene_ob.add_object_array(speech_objects,description_objects)
 
+        # For each scene object call data builder.
+        for scene_ob in self.__scene_object_array:
+            scene_ob.build_data_dict()
 
-
-
+        # Testing
 
 
     # Extract date from moive
@@ -434,7 +435,7 @@ if __name__ == '__main__':
     #     print(e)
     #     print("Error")
 
-    print(test_script)
-    print(test_script.imdb_dict)
+    # print(test_script)
+    # print(test_script.imdb_dict)
     # print(test_script.generate_error_report())
 
