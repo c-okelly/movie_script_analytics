@@ -163,6 +163,7 @@ class Scene_change:
         self.scene_change_to_outside = change_type
         # Values assigned using an setter function. Should be set in the following order
         self.finish_count = None
+        self.objects_in_scene = None
 
     def __repr__(self):
         return "Scene change at " + str(self.start_count) + "% through the script"
@@ -171,6 +172,10 @@ class Scene_change:
     def add_scene_finish_point(self,finish_count):
 
         self.finish_count = finish_count
+
+    def add_object_array(self,object_array):
+
+        self.objects_in_scene = object_array
 
 
 

@@ -436,5 +436,5 @@ if __name__ == '__main__':
 
     print(test_script)
     print(test_script.imdb_dict)
-    print(test_script.generate_error_report())
+    # print(test_script.generate_error_report())
 
