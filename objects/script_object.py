@@ -114,7 +114,8 @@ class Script:
                 if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
                     self.__add_speech_ob_to_array(text_section,percentage_count)
                 else:
-                    print(text_section)
+                    pass
+                    # print(text_section)
                 # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
 
 
@@ -124,7 +125,8 @@ class Script:
                 if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
                     self.__add_speech_ob_to_array(text_section,percentage_count)
                 else:
-                    print(text_section)
+                    pass
+                    # print(text_section)
 
             ### Discription / Other
             # # Description section / others

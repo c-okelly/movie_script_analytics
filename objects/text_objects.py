@@ -40,6 +40,15 @@ class TextBasedSection:
 
         return average_sentiment
 
+    def return_language_analysis_dict(self,string_to_be_analysed):
+
+        language_dict = {}
+
+
+
+        return
+
+
 
 
 class Speech(TextBasedSection):
@@ -65,7 +74,7 @@ class Speech(TextBasedSection):
         self.no_words = self.__return_no_words()
         # Extra analysis on text => built incrementally using previous attributes
         # Average sentence legth
-        self.avg_setenece_length = self.__avg_sentence_legth()
+        self.avg_sentence_length = self.__avg_sentence_legth()
 
     def __repr__(self):
         return "Speech object for character " + self.character + ". Abs count = " + str(self.count) + "%. Speech count = " + str(self.speech_count) + "%"
@@ -133,12 +142,12 @@ class Speech(TextBasedSection):
         punctuation_stops = no_full_stops + no_question_marks + exclmation_marks + exclmation_and_question + question_and_exclmation + cut_off
 
         if punctuation_stops != 0:
-            self.avg_setenece_length = word_count / punctuation_stops
-            # print(self.text, self.avg_setenece_length)
+            self.avg_sentence_length = word_count / punctuation_stops
+            # print(self.text, self.avg_sentence_length)
         else:
-            self.avg_setenece_length = word_count
+            self.avg_sentence_length = word_count
 
-        return self.avg_setenece_length
+        return self.avg_sentence_length
 
     def add_speech_count(self,speech_count_in):
 
@@ -229,17 +238,16 @@ class Scene_change:
             scene_only_description = 0
 
         ### Dict of characters in scene with data
-        characters_in_scene_dict = {}
         characters_in_scene_dict = self.__generate_character_in_scene_dict(total_speech)
 
         # Test print.
-        print(characters_in_scene_dict, "\n")
+        # print(characters_in_scene_dict, "\n")
 
         ### Find top 10 characters in each scene
         # Cycle through dict. Create array of character_name and % in scene. Sort and take first 5
         top_ten_characters_in_scene = self.__find_top_10_character(characters_in_scene_dict)
 
-        print(top_ten_characters_in_scene)
+        # print(top_ten_characters_in_scene)
 
         ### Sentiment of section
         # For each add all sentiments to array. Exclude 0 elements, take absolute values sum and divide by number left.
@@ -287,22 +295,48 @@ class Scene_change:
         # print(speech_sentiment,description_sentiment,overall_sentiment)
 
         # Scene type => mono / duo / tri / multi
-        scene_interaction_type = self.__determine_scene_type(characters_in_scene_dict)
+        scene_interaction_type = self.__determine_scene_interaction_type(top_ten_characters_in_scene)
 
         # Sentence length for speech
-        average_speech_sentence_length = 0
+        average_sentence_length_array = []
 
-        # Language analysis
+        for scene_ob in self.speech_object_array:
+            average_sentence_length_array.append(scene_ob.avg_sentence_length)
+        try:
+            average_speech_sentence_length = sum(average_sentence_length_array) / len(average_sentence_length_array)
+        except ZeroDivisionError:
+            average_speech_sentence_length = 0
+        # print(average_speech_sentence_length)
+
+        ### Language analysis
+
 
         # Build scene_info_dict => from all variables above
 
         return self.scene_info_dict
 
-    def __determine_scene_type(self,character_interaction_dict):
+    def __determine_scene_interaction_type(self,top_characters_array):
 
-        print(character_interaction_dict)
+        interaction_dict = {}
+        if len(top_characters_array) > 0:
+            # If more then 80 % => Single person
+            if top_characters_array[0][1] > 0.8:
+                print(top_characters_array, "single person")
 
-        return 0
+            # If 2 combined more then 85 % => Two people
+            elif (top_characters_array[0][1] + top_characters_array[1][1]) > 0.85:
+                print(top_characters_array, "two people")
+            # If 2 combined more then 85 % => Three people
+            elif (top_characters_array[0][1] + top_characters_array[1][1] + top_characters_array[2][1]) > 0.8:
+                print(top_characters_array, "three people")
+            else:
+                print("multiple")
+        else:
+            interaction_dict["no_characters"] = 0
+            interaction_dict["percentage_of_scene"] = 0
+
+
+        return interaction_dict
 
     def __find_top_10_character(self,characters_in_scene_dict):
 
@@ -334,7 +368,13 @@ class Scene_change:
             character_name = ob.character
             # Percentage of words in scene
             no_words = ob.no_words
-            percentage_scene_speech = no_words / all_speech_in_scene
+
+            try:
+                percentage_scene_speech = no_words / all_speech_in_scene
+            except ZeroDivisionError:
+                # print(character_name)
+                percentage_scene_speech = 0
+
             section_sentiment = ob.sentiment
 
             # Check if name in dict. If not add it and add other variables
