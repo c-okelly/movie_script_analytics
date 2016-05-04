@@ -96,6 +96,7 @@ class Script:
             current_word_count += (len(re.findall("\w+",text_section)))
             percentage_count = current_word_count / total_words
 
+            ### Scene Change
             # Check first line to see if its all upper case => scene change => ext
             if text_section.split("\n")[0].isupper() and (re.search('\s{0,3}EXT\.', text_section)):
                 self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=1)
@@ -105,18 +106,27 @@ class Script:
             elif (text_section.split("\n")[0].isupper() and re.search('\s{0,3}INT\.', text_section)):
                 self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=0)
 
-
+            ### Speech
             # Check first line to see if its all upper case And that more then one line => character speech
             # Mark as discriptiong if more then 5 words without and / to seperate them
             elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5:
-                self.__add_speech_ob_to_array(text_section,percentage_count)
+                # Check first line does not containtd the word omit
+                if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
+                    self.__add_speech_ob_to_array(text_section,percentage_count)
+                else:
+                    print(text_section)
                 # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
 
 
             # Check if character name follows by item in brackets => character speech
             elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]):
-                self.__add_speech_ob_to_array(text_section,percentage_count)
+                # Check first line does not containtd the word omit
+                if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
+                    self.__add_speech_ob_to_array(text_section,percentage_count)
+                else:
+                    print(text_section)
 
+            ### Discription / Other
             # # Description section / others
             else:
                 # If section is more the 70% whitespace discard it
@@ -424,12 +434,12 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/17-Again.txt") as file:
+    with open("../Data/scripts_text/12-Years-a-Slave.txt") as file:
         text_file = file.read()
 
 
     # try:
-    test_script = Script(text_file,"17-Again.txt")
+    test_script = Script(text_file,"12-Years-a-Slave.txt")
 
     # except Exception as e:
     #     print(e)
