@@ -4,9 +4,10 @@
 from nltk import tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import re
+from collections import defaultdict
 
 # Generalised analytsis functions # Abstract function
-class TextBasedScetion:
+class TextBasedSection:
 
     def check_inheritance(self):
         print("hi")
@@ -39,7 +40,7 @@ class TextBasedScetion:
 
         return average_sentiment
 
-class Speech(TextBasedScetion):
+class Speech(TextBasedSection):
 
     def __init__(self,text,count):
 
@@ -47,7 +48,6 @@ class Speech(TextBasedScetion):
 
         self.text = text
         self.count = count
-        self.speech_count = 0
         # Percent point in speech - added later once whole script has been processed
         self.speech_count = 0
         # Error message if character names can't be found
@@ -142,14 +142,24 @@ class Speech(TextBasedScetion):
 
         self.speech_count = speech_count_in
 
-class Discription(TextBasedScetion):
+class Discription(TextBasedSection):
 
     def __init__(self,text,count):
 
         self.text = text
         self.count = count
+        # No of words
+        self.no_words = self.__return_no_words()
+
         # Sentiment analysis averaged for section and returned.
         self.sentimnet = self.sentiment_analytis_text(self.text)
+
+    def __return_no_words(self):
+
+        text = self.text
+        count = len(re.findall("\w+",text))
+
+        return count
 
     def __repr__(self):
         return "Discription object form " + str(self.count) + "% way through the movie"
@@ -162,10 +172,14 @@ class Scene_change:
         self.start_count = start_count
         # Duplicate attriubte to make scene and speech more homegnous
         self.count = start_count
+        # Change to outside => true = 1
         self.scene_change_to_outside = change_type
         # Values assigned using an setter function. Should be set in the following order
         self.finish_count = None
-        self.objects_in_scene = []
+        self.speech_object_array = []
+        self.description_object_array = []
+        # Data dictionary => Built by function once all inputs have been collected
+        self.scene_info_dict = {}
 
     def __repr__(self):
         return "Scene change at " + str(self.start_count) + "% through the script"
@@ -175,17 +189,118 @@ class Scene_change:
 
         self.finish_count = finish_count
 
-    def add_object_array(self,object_array):
+    def add_object_array(self,speech_object_array,description_object_array):
 
-        self.objects_in_scene = object_array
+        # Check that objects arrays are of the correct type or that array is empty
+        assert len(speech_object_array) == 0 or type(speech_object_array[0]) == Speech
+        assert len(description_object_array) == 0 or type(description_object_array[0]) == Discription
+
+        self.speech_object_array = speech_object_array
+        self.description_object_array = description_object_array
+
+    # Use information to build a dict of information containted in scene.
+    def build_data_dict(self):
+
+        # Word analysis
+        # Total / percentages
+        total_speech = self.count_words_of_type_in_ob_array(type_speech=1)
+        total_description = self.count_words_of_type_in_ob_array(type_description=1)
+        total_words = total_speech + total_description
+        # ensure no division by 0
+        if total_words == 0:
+            total_words = 1
+
+        percent_speech = total_speech / total_words
+        percent_description = total_description / total_words
+
+        print("s",total_speech,"d",total_description,"t",total_words,"speech ",percent_speech,"descrip ",percent_description)
+
+        # No of sections
+        no_speech_sections = len(self.speech_object_array)
+        no_description_sections = len(self.description_object_array)
+        print("s",no_speech_sections,"d",no_description_sections)
+
+        # List of
+        list_of_characters = []
+        characters_in_scene_dict = defaultdict(int)
+        # Cycle through object array and add name if not already in list
+        for ob in self.speech_object_array:
+            character_name = ob.character
+
+            characters_in_scene_dict[character_name] += 1
+
+        print(characters_in_scene_dict, "\n")
+        top_five_characters_in_scene = {}
+
+        # Sentiment of section
+        speech_sentiment = 0
+        description_sentiment = 0
+        overall_sentiment = 0
+
+        # Scene type => mixed / only description - imply cut scene
+        scene_only_description = 0
+
+        # Scene type => mono / duo / tri / multi
+        scene_interaction_type = ""
+
+        # Sentence length for speech
+        average_speech_sentence_length = 0
+
+        # Language analysis
+
+
+        pass
+
+    def count_words_of_type_in_ob_array(self,type_description=0,type_speech=0):
+
+        total_count = 0
+
+        if type_description == 1:
+            search_array = self.description_object_array
+        elif type_speech == 1:
+            search_array = self.speech_object_array
+        else:
+            search_array = []
+
+        # Check array is set and greater then 0. Count no of words in array
+        if len(search_array) > 0:
+            total_count = 0
+            for ob in search_array:
+                number_of_words = ob.no_words
+                total_count += number_of_words
+
+        return total_count
+
+    def return_string_words_in_ob_array(self,ob_array):
+
+        word_string = ""
+
+        for ob in ob_array:
+            word_string += ob.text
+
+        return word_string
 
 
 
 if __name__ == '__main__':
 
-    text_ob = Discription("""  Coach Harvey pulls the Players apart just as the gym doors
-          burst open. ED FREEDMAN, 17, sporting a jacket over a WIZARD
-          costume, runs in, trips on his robe, gets up, peels his
-          clothes off.""",0.5)
+    des = Discription("""  Coach Harvey pulls the Players apart just as the gym doors
+          burst open.""",0.5)
+    spe = Speech("""  MIKE
+                    The best choice I ever made was
+                    you.""",0.5)
+    spe_2 = Speech("""  MIKE
+                    The best choice I ever made was
+                    you.""",0.5)
+    spe_1 = Speech("""  SCARLET
+                    What took you so long?""",0.5)
 
-    print(text_ob.sentimnet)
+
+    scene = Scene_change(" INT. FITCH SENIOR HIGH SCHOOL/TUNNEL - NIGHT",0.5,0)
+
+    scene.add_scene_finish_point(0.6)
+    scene.add_object_array([spe,spe_1,spe_2],[des,des])
+
+
+
+    scene.build_data_dict()
