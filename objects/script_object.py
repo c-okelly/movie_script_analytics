@@ -210,6 +210,13 @@ class Script:
                 # No more object this is the last. Ends at 1
                 current_scene_ob.add_scene_finish_point(1)
 
+        # Choice of type => set to 1
+        scene_object = self.__return_object_of_type_in_range(0.1,0.3)
+
+        scene_object = self.__return_object_of_type_in_range(0.1,0.15,speech_speech_count=1)
+        print(scene_object)
+
+
 
 
 
@@ -263,29 +270,48 @@ class Script:
 
         selection_total = speech_normal_count + speech_speech_count + discription + scene
         # Check that only one option has been selected
-        if selection_total != 1:
+        if selection_total > 1:
             print("More then one type was selected")
             object_array = None
         elif selection_total == 0:
             print("Type was not set")
             object_array = None
-        # Set search array.d
+
+        # Search array
         elif speech_normal_count == 1: # Measured by general count
             search_array = self.__speech_object_array
+            # Return correct objects
+            for ob in search_array:
+                if ob.count > start and ob.count < finish:
+                    object_array.append(ob)
+
         elif speech_speech_count == 1: # Measured by speech count
             search_array = self.__speech_object_array
+            # Return correct objects
+            for ob in search_array:
+                if ob.speech_count > start and ob.speech_count < finish:
+                    object_array.append(ob)
+
         elif discription == 1:
             search_array = self.__description_object_array
+            # Return correct objects
+            for ob in search_array:
+                if ob.count > start and ob.count < finish:
+                    object_array.append(ob)
+
+        # Scene object are returned depending on their start location
         elif scene:
             search_array = self.__scene_object_array
+            # Return correct objects
+            for ob in search_array:
+                if ob.start_count > start and ob.start_count < finish:
+                    object_array.append(ob)
+
         else:
             print("Type was not set")
             object_array = None
 
-
-        return
-
-
+        return object_array
 
     def update_imdb_dict(self,new_search_name):
         try:
