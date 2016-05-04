@@ -5,7 +5,41 @@ from nltk import tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import re
 
-class Speech:
+# Generalised analytsis functions # Abstract function
+class TextBasedScetion:
+
+    def check_inheritance(self):
+        print("hi")
+
+    # Take text and return sentiment
+    def sentiment_analytis_text(self,text_insert):
+
+        text = text_insert
+
+        token_text = tokenize.sent_tokenize(text)
+        sid = SentimentIntensityAnalyzer()
+
+        over_all_sentimnet = 0
+        count = 0
+
+        for sentence in token_text:
+            score = sid.polarity_scores(sentence)
+            # Create over all sentiment score
+            over_all_sentimnet += score.get("compound")
+
+            # If sentence is not neuteral add to sentence count for average
+            if (score.get("compound") >  0.1):
+                count += 1
+
+        # Calculate average sentiment
+        if count > 0:
+            average_sentiment = over_all_sentimnet/count
+        else:
+            average_sentiment = over_all_sentimnet
+
+        return average_sentiment
+
+class Speech(TextBasedScetion):
 
     def __init__(self,text,count):
 
@@ -25,7 +59,7 @@ class Speech:
         # Cleaned text version without character name
         self.cleaned_text = self.__cleaned_text()
         # Sentiment analysis averaged for section and returned.
-        self.sentimnet = self.__sentiment_analytis_text()
+        self.sentimnet = self.sentiment_analytis_text(self.cleaned_text)
         self.no_words = self.__return_no_words()
         # Extra analysis on text => built incrementally using previous attributes
         # Average sentence legth
@@ -70,35 +104,6 @@ class Speech:
 
         return multiple_characters
 
-    def __sentiment_analytis_text(self):
-
-        text = self.text
-        # Strip character name from string
-        text = text.replace(self.character,"")
-
-        token_text = tokenize.sent_tokenize(text)
-        sid = SentimentIntensityAnalyzer()
-
-        over_all_sentimnet = 0
-        count = 0
-
-        for sentence in token_text:
-            score = sid.polarity_scores(sentence)
-            # Create over all sentiment score
-            over_all_sentimnet += score.get("compound")
-
-            # If sentence is not neuteral add to sentence count for average
-            if (score.get("compound") >  0.1):
-                count += 1
-
-        # Calculate average sentiment
-        if count > 0:
-            average_sentiment = over_all_sentimnet/count
-        else:
-            average_sentiment = over_all_sentimnet
-
-        return average_sentiment
-
     def __return_no_words(self):
 
         text = self.cleaned_text
@@ -137,44 +142,17 @@ class Speech:
 
         self.speech_count = speech_count_in
 
-class Discription:
+class Discription(TextBasedScetion):
 
     def __init__(self,text,count):
 
         self.text = text
         self.count = count
         # Sentiment analysis averaged for section and returned.
-        self.sentimnet = self.__sentiment_analytis_text()
+        self.sentimnet = self.sentiment_analytis_text(self.text)
 
     def __repr__(self):
         return "Discription object form " + str(self.count) + "% way through the movie"
-
-    def __sentiment_analytis_text(self):
-
-        text = self.text
-
-        token_text = tokenize.sent_tokenize(text)
-        sid = SentimentIntensityAnalyzer()
-
-        over_all_sentimnet = 0
-        count = 0
-
-        for sentence in token_text:
-            score = sid.polarity_scores(sentence)
-            # Create over all sentiment score
-            over_all_sentimnet += score.get("compound")
-
-            # If sentence is not neuteral add to sentence count for average
-            if (score.get("compound") >  0.1):
-                count += 1
-
-        # Calculate average sentiment
-        if count > 0:
-            average_sentiment = over_all_sentimnet/count
-        else:
-            average_sentiment = over_all_sentimnet
-
-        return average_sentiment
 
 class Scene_change:
 
@@ -182,8 +160,9 @@ class Scene_change:
 
         self.text = text
         self.start_count = start_count
-        self.finish_count = None
         self.scene_change_to_outside = change_type
+        # Values assigned using an setter function. Should be set in the following order
+        self.finish_count = None
 
     def __repr__(self):
         return "Scene change at " + str(self.start_count) + "% through the script"
@@ -202,5 +181,4 @@ if __name__ == '__main__':
           costume, runs in, trips on his robe, gets up, peels his
           clothes off.""",0.5)
 
-    print(text_ob)
     print(text_ob.sentimnet)
