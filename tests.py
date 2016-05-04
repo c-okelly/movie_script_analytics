@@ -1,29 +1,31 @@
 import re
 
-f = open("Data/scripts_text/17-Again.txt", 'r')
-text = f.read()
+import text_objects
+
+# f = open("Data/scripts_text/17-Again.txt", 'r')
+# text = f.read()
 # text = text[900:1500]
 # print(text)
 
 # count = len(re.findall("\W+",text))
 # print(count)
-
-lines = text.split('\n')
-lines_on_empty = re.split("\n\s+\n", text)
-print(len(lines))
-print(len(lines_on_empty))
-
-# Find empty lines
-count = 0
-for item in lines:
-    if re.search("\A\s+\Z", item):
-        print(count)
-    count += 1
-
-# Search for character names in list
-for item in lines:
-    if re.search("\A\s*Name_character\s*(\(.*\))?\s*\Z", item):
-        print(item)
+#
+# lines = text.split('\n')
+# lines_on_empty = re.split("\n\s+\n", text)
+# print(len(lines))
+# print(len(lines_on_empty))
+#
+# # Find empty lines
+# count = 0
+# for item in lines:
+#     if re.search("\A\s+\Z", item):
+#         print(count)
+#     count += 1
+#
+# # Search for character names in list
+# for item in lines:
+#     if re.search("\A\s*Name_character\s*(\(.*\))?\s*\Z", item):
+#         print(item)
 
 # # Generate list of characters from the script
 # characters = dict()
@@ -53,3 +55,25 @@ for item in lines:
 
 
 # Get description lines
+
+if __name__ == '__main__':
+
+    dog_array = []
+
+    dog = text_objects.Speech("Hello",0.4)
+    dog_array.append(dog)
+    dog = text_objects.Speech("cat",0.5)
+    dog_array.append(dog)
+    dog = text_objects.Speech("DOG \n yello",0.6)
+    dog_array.append(dog)
+
+    for i in dog_array:
+        print(i)
+
+    new_array = []
+
+    for i in dog_array:
+        if i.count >= 0.5:
+            new_array.append(i)
+
+    print(new_array)
