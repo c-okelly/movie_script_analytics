@@ -213,11 +213,6 @@ class Script:
 
 
 
-
-
-
-
-
     # Extract date from moive
     def __extract_data_from_movie(self):
 
@@ -260,19 +255,32 @@ class Script:
 
         # Catagories of language used => adverbs / adjectives
 
-    # Fetch objects in specified range
-    def __return_object_of_type_in_range(self,start,finish,type): # Untested!!
+    # Fetch objects in specified range. It will return object pointers in a specified range.
+    # Four main serach types. To search that array type set one of them equal to 1
+    def __return_object_of_type_in_range(self,start,finish,speech_normal_count=0,speech_speech_count=0,discription=0,scene=0): # Untested!!
 
         object_array = []
 
-        if type == "speech_1": # Measured by general count
+        selection_total = speech_normal_count + speech_speech_count + discription + scene
+        # Check that only one option has been selected
+        if selection_total != 1:
+            print("More then one type was selected")
+            object_array = None
+        elif selection_total == 0:
+            print("Type was not set")
+            object_array = None
+        # Set search array.d
+        elif speech_normal_count == 1: # Measured by general count
             search_array = self.__speech_object_array
-        elif type == "speech_2": # Measured by speech count
+        elif speech_speech_count == 1: # Measured by speech count
             search_array = self.__speech_object_array
-        elif type == "discription":
+        elif discription == 1:
             search_array = self.__description_object_array
-        elif type == "scene":
+        elif scene:
             search_array = self.__scene_object_array
+        else:
+            print("Type was not set")
+            object_array = None
 
 
         return
@@ -312,6 +320,11 @@ class Script:
     def __generate_dict_of_characters(self):
         characters_dict = {}
 
+        # For external info function => there are formatting requirements;
+        # Dict passed should be a hold each character as a sub-dict where the character name is the key
+        # Each sub-dict must contain the following keys and respective vars
+        # 1. => "character_name":$char_name 2. => "no_appearances":$no_times_appeared
+
         # Generate Character name / no parts
         for speech_ob in self.__speech_object_array:
             character_name = speech_ob.character
@@ -320,25 +333,14 @@ class Script:
             else:
                 characters_dict[character_name] = 1
 
-        updated_dict = (characters_dict)
+        # Uses function in extre_character_info_for_movie_dict to map character to actor, add the meta critic rating, gender and find imdb character name
+        updated_dict = (characters_dict) # Not calling to external just yet. Needs testing. Plus create a huge number of external html requests
 
+        # print(characters_dict)
+        # string = self.__get_string_character_speech("DOM")
+        # print(string)
 
         return updated_dict
-
-    # Been removed into an external class as was too much code
-    # def __add_extra_info_to_characters_dict(self,characters_dict): # Information
-    #
-    #     # Return characters dict with extra information in it
-    #
-    #     character_list = []
-    #     # Create list of characters that are in the movie
-    #     for character in characters_dict:
-    #         character_list.append([character, characters_dict[character]])
-    #     # Sorted list by number of appearances in movie
-    #     sorted_character_list = sorted(character_list, key=lambda x:x[1],reverse=True)
-    #     print(sorted_character_list)
-    #
-    #     string = self.__get_string_character_speech("TONY LOOKS")
 
     def __get_chracter_info_by_name(self,seach_name):
 
