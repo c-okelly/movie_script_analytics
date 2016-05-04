@@ -5,7 +5,7 @@
 Data/
 
 # Tests file
-test.py 
+tests.py 
 
 
 Movie-script-parser/
