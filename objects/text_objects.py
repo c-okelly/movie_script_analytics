@@ -40,7 +40,7 @@ class TextBasedSection:
 
         return average_sentiment
 
-    
+
 
 class Speech(TextBasedSection):
 
@@ -341,18 +341,46 @@ class Scene_change:
         except ZeroDivisionError:
             overall_sentiment = 0
 
-        print(speech_sentiment,description_sentiment,overall_sentiment)
+        # print(speech_sentiment,description_sentiment,overall_sentiment)
 
         # Scene type => mono / duo / tri / multi
-        scene_interaction_type = ""
+        scene_interaction_type = self.__determine_scene_type(characters_in_scene_dict)
 
         # Sentence length for speech
         average_speech_sentence_length = 0
 
         # Language analysis
 
+        # Build scene_info_dict => from all variables above
 
-        pass
+        return self.scene_info_dict
+
+    def __determine_scene_type(self,character_interaction_dict):
+
+        print(character_interaction_dict)
+
+        return 0
+
+    def __find_top_10_character(self,characters_in_scene_dict):
+
+        ### Find top 10 characters in each scene
+        # Cycle through dict. Create array of character_name and % in scene. Sort and take first 5
+        all_chars_array = []
+        for char_dict_name in characters_in_scene_dict:
+            current_dict_1 = characters_in_scene_dict.get(char_dict_name)
+            character_info = [current_dict_1.get("name"), current_dict_1.get("scene_percentage")]
+            all_chars_array.append(character_info)
+
+        # Sort character array based on percentage of scene. So highest is first
+        sorted_all_chars_array = sorted(all_chars_array, key=lambda x:x[1],reverse=True)
+
+        # Take top 5 character from each scene if there is more then 10
+        if len(sorted_all_chars_array)> 10:
+            top_ten_characters_in_scene = sorted_all_chars_array[:10]
+        else:
+            top_ten_characters_in_scene = sorted_all_chars_array
+
+        return top_ten_characters_in_scene
 
     def count_words_of_type_in_ob_array(self,type_description=0,type_speech=0):
 
@@ -374,11 +402,20 @@ class Scene_change:
 
         return total_count
 
-    def return_string_words_in_ob_array(self,ob_array):
+    def return_string_words_in_ob_array(self,description_array=0,speech_array=0):
 
         word_string = ""
 
-        for ob in ob_array:
+        # Set search arry
+        if description_array == 1:
+            search_array = self.description_object_array
+        elif speech_array == 1:
+            search_array = self.speech_object_array
+        else:
+            search_array = []
+            word_string = "No array selected for search"
+
+        for ob in search_array:
             word_string += ob.text
 
         return word_string
