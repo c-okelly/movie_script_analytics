@@ -213,15 +213,20 @@ class Scene_change:
         percent_speech = total_speech / total_words
         percent_description = total_description / total_words
 
-        print("s",total_speech,"d",total_description,"t",total_words,"speech ",percent_speech,"descrip ",percent_description)
+        # print("s",total_speech,"d",total_description,"t",total_words,"speech ",percent_speech,"descrip ",percent_description)
 
         # No of sections
         no_speech_sections = len(self.speech_object_array)
         no_description_sections = len(self.description_object_array)
-        print("s",no_speech_sections,"d",no_description_sections)
+        # print("s",no_speech_sections,"d",no_description_sections)
 
-        # List of
-        list_of_characters = []
+        # Scene type => mixed / only description - imply cut scene
+        if no_speech_sections == 0 and no_description_sections > 0:
+            scene_only_description = 1
+        else:
+            scene_only_description = 0
+
+        # Dict of characters in scene with data
         characters_in_scene_dict = {}
         # Cycle through object array getting character names and add name if not already in list
         all_speech_in_scene = total_speech
@@ -246,17 +251,54 @@ class Scene_change:
                 # Not in dict. Create new sub dict and add first values in.
                 characters_in_scene_dict[character_name] = {"name":character_name,"sections":1,"no_words":no_words,"scene_percentage":percentage_scene_speech,"sentiment_array":[section_sentiment]}
 
+        # Cycle through dicts and add new variable of averaged sentiment.
+        # Add all variables and divide number of non zero ones.
+        for char_dict in characters_in_scene_dict:
+            current_dict = characters_in_scene_dict.get(char_dict)
+            current_sentiment_array = current_dict.get("sentiment_array")
+            # Add sentiments and get average
+            avg_sentiment = 0
+            no_non_zero_sentiments = 0
+            total_of_sentiments = 0
+            for sentiment_value in current_sentiment_array:
+                if sentiment_value != 0:
+                    no_non_zero_sentiments += 1
+                # Add sentiment values together
+                total_of_sentiments += sentiment_value
 
+            # Get average sentiment and add to current dict. Prevent division by 0
+            if no_non_zero_sentiments == 0:
+                avg_sentiment = 0
+            else:
+                avg_sentiment = total_of_sentiments / no_non_zero_sentiments
+
+            current_dict["average_sentiment"] = avg_sentiment
+
+        # Test print.
         print(characters_in_scene_dict, "\n")
-        top_five_characters_in_scene = {}
+
+        # Find top 5 characters in each scene
+        # Cycle through dict. Create array of character_name and % in scene. Sort and take first 5
+        all_chars_array = []
+        for char_dict_name in characters_in_scene_dict:
+            current_dict_1 = characters_in_scene_dict.get(char_dict_name)
+            character_info = [current_dict_1.get("name"), current_dict_1.get("scene_percentage")]
+            all_chars_array.append(character_info)
+
+        # Sort character array based on percentage of scene. So highest is first
+        sorted_all_chars_array = sorted(all_chars_array, key=lambda x:x[1],reverse=True)
+
+        # Take top 5 character from each scene if there is more then 5
+        if len(sorted_all_chars_array)> 5:
+            top_five_characters_in_scene = sorted_all_chars_array[:5]
+        else:
+            top_five_characters_in_scene = sorted_all_chars_array
+        print(top_five_characters_in_scene)
 
         # Sentiment of section
         speech_sentiment = 0
         description_sentiment = 0
         overall_sentiment = 0
-
-        # Scene type => mixed / only description - imply cut scene
-        scene_only_description = 0
 
         # Scene type => mono / duo / tri / multi
         scene_interaction_type = ""
