@@ -109,24 +109,24 @@ class Script:
             ### Speech
             # Check first line to see if its all upper case And that more then one line => character speech
             # Mark as discriptiong if more then 5 words without and / to seperate them
-            elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5:
-                # Check first line does not containtd the word omit
-                if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
-                    self.__add_speech_ob_to_array(text_section,percentage_count)
-                else:
-                    pass
-                    # print(text_section)
+            
+            # Third first line does not containtd the word omit / ommitted
+            # Forth check => loods for time / date in format of -month/month(?), 1927- for the first line
+            elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5 and \
+                    not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]) \
+                    and not re.match("^\s+-(\w+\s{0,3},?/?){0,4}(\s\d{0,5})?-",text_section.split("\n")[0]):
+                # print(re.match("^\s+-(\w+\s{0,3},?/?){0,4}(\s\d{0,5})?-",text_section.split("\n")[0]))
+                # print(text_section.split("\n")[0])
+                self.__add_speech_ob_to_array(text_section,percentage_count)
                 # Catches sections of discriptions that are in all caps. Normally words displayed on screen. Could be argued as speech????
 
 
-            # Check if character name follows by item in brackets => character speech
-            elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]):
-                # Check first line does not containtd the word omit
-                if not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
-                    self.__add_speech_ob_to_array(text_section,percentage_count)
-                else:
-                    pass
-                    # print(text_section)
+            # Check if character name follows by item in brackets => character speech Check first line does not containtd the word omit
+            ###     Only idenfifying orphaned speech sections at this moment    ###
+            elif re.search("\A(\s*[A-Z]+?){1,2}\s*(\(.*\))?\s*\Z",text_section.split("\n")[0]) and not re.search("(\s+OMIT\s*)|(\s+OMITTED\s*)",text_section.split("\n")[0]):
+                self.__add_speech_ob_to_array(text_section,percentage_count)
+                # else:
+                #     print(text_section, "One")
 
             ### Discription / Other
             # # Description section / others
@@ -136,8 +136,9 @@ class Script:
                     # print(text_section, "Discarded")
                     pass
 
-                # Normal discription section
+                # Normal description section
                 else:
+                    # print(text_section)
                     self.__add_discription_ob_to_array(text_section,percentage_count)
 
     # Finishing building text objects using information collect after running over script once
@@ -406,7 +407,7 @@ class Script:
             else:
                 characters_dict[character_name] = {"character_name":character_name,"no_appearances":1}
 
-        print(characters_dict)
+        # print(characters_dict)
 
         ### Add percentage of speech for each character
         for character in characters_dict:
