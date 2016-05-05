@@ -503,7 +503,11 @@ class Scene_change(TextBasedSection):
 
         return word_string
 
+class TextWorker(TextBasedSection):
+    ### Classed used to access funcitons in class => TextBasedSection
 
+    def __init__(self):
+        pass
 
 if __name__ == '__main__':
 
