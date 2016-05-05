@@ -109,7 +109,7 @@ class Script:
             ### Speech
             # Check first line to see if its all upper case And that more then one line => character speech
             # Mark as discriptiong if more then 5 words without and / to seperate them
-            
+
             # Third first line does not containtd the word omit / ommitted
             # Forth check => loods for time / date in format of -month/month(?), 1927- for the first line
             elif text_section.split("\n")[0].isupper() and text_section.count("\n") > 1 and len(re.findall("\w+",text_section.split("\n")[0]))< 5 and \
@@ -414,8 +414,11 @@ class Script:
             current_char_name = characters_dict.get(character).get("character_name")
             character_string = self.__get_string_character_speech(current_char_name)
             # print(character_string)
-            no_words = len(re.findall("\w+",character_string))
+            # Get no words and calculate percentage
+            no_words_for_char = len(re.findall("\w+",character_string))
+            characters_dict.get(character)["no_words"] = no_words_for_char
 
+        print(characters_dict)
 
         ### Sentiment plot for each character and average sentiment => plot will be done by generate average within a range
 
