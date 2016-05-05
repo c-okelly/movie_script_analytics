@@ -44,6 +44,8 @@ class TextBasedSection:
 
         language_dict = {}
 
+        
+
 
 
         return
@@ -295,7 +297,8 @@ class Scene_change:
         # print(speech_sentiment,description_sentiment,overall_sentiment)
 
         # Scene type => mono / duo / tri / multi
-        scene_interaction_type = self.__determine_scene_interaction_type(top_ten_characters_in_scene)
+        scene_interaction_dict = self.__determine_scene_interaction_type(top_ten_characters_in_scene)
+        print(scene_interaction_dict)
 
         # Sentence length for speech
         average_sentence_length_array = []
@@ -321,19 +324,29 @@ class Scene_change:
         if len(top_characters_array) > 0:
             # If more then 80 % => Single person
             if top_characters_array[0][1] > 0.8:
-                print(top_characters_array, "single person")
+                interaction_dict["one_main_character"] = 1
+                interaction_dict["two_main_character"] = 0
+                interaction_dict["multiple_characters"] = 0
+                interaction_dict["percentage_of_scene"] = top_characters_array[0][1]
 
-            # If 2 combined more then 85 % => Two people
+            # If 2 combined more then 80 % => Two people
             elif (top_characters_array[0][1] + top_characters_array[1][1]) > 0.85:
-                print(top_characters_array, "two people")
-            # If 2 combined more then 85 % => Three people
-            elif (top_characters_array[0][1] + top_characters_array[1][1] + top_characters_array[2][1]) > 0.8:
-                print(top_characters_array, "three people")
+                interaction_dict["one_main_character"] = 0
+                interaction_dict["two_main_character"] = 1
+                interaction_dict["multiple_characters"] = 0
+                interaction_dict["percentage_of_scene"] = top_characters_array[0][1] + top_characters_array[1][1]
+            # Else => multiple
             else:
-                print("multiple")
+                interaction_dict["one_main_character"] = 0
+                interaction_dict["two_main_character"] = 0
+                interaction_dict["multiple_characters"] = 1
+                interaction_dict["percentage_of_scene"] = None
+
         else:
-            interaction_dict["no_characters"] = 0
-            interaction_dict["percentage_of_scene"] = 0
+            interaction_dict["one_main_character"] = 0
+            interaction_dict["two_main_character"] = 0
+            interaction_dict["multiple_characters"] = 0
+            interaction_dict["percentage_of_scene"] = None
 
 
         return interaction_dict
