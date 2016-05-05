@@ -247,6 +247,7 @@ class Scene_change(TextBasedSection):
         ### No of sections
         no_speech_sections = len(self.speech_object_array)
         no_description_sections = len(self.description_object_array)
+        no_total_sections = no_speech_sections + no_description_sections
         # print("s",no_speech_sections,"d",no_description_sections)
 
         ### Scene type => mixed / only description - imply cut scene
@@ -312,11 +313,11 @@ class Scene_change(TextBasedSection):
 
         # print(speech_sentiment,description_sentiment,overall_sentiment)
 
-        # Scene type => mono / duo / tri / multi
+        ### Scene type => mono / duo / tri / multi
         scene_interaction_dict = self.__determine_scene_interaction_type(top_ten_characters_in_scene)
         # print(scene_interaction_dict)
 
-        # Sentence length for speech
+        ### Sentence length for speech
         average_sentence_length_array = []
 
         for scene_ob in self.speech_object_array:
@@ -331,11 +332,22 @@ class Scene_change(TextBasedSection):
         # Get strings
         speech_string = self.return_string_words_in_ob_array(speech_array=1)
         description_string = self.return_string_words_in_ob_array(description_array=1)
+        both_strings = speech_string + description_string
         # Use function from parent class to perform the analysis
         speech_language_dict = self.return_language_analysis_dict(speech_string)
         description_language_dict = self.return_language_analysis_dict(description_string)
+        overall_lanaguage_dict = self.return_language_analysis_dict(both_strings)
 
         # Build scene_info_dict => from all variables above
+
+        self.scene_info_dict = {"total_speech":total_speech,"total_description":total_description,"total_words":total_words,"percent_speech":percent_speech,
+                                "percent_description":percent_description,"no_speech_sections":no_speech_sections,"no_description_sections":no_description_sections,
+                                "no_total_sections":no_total_sections,"scene_only_description":scene_only_description,
+                                "characters_in_scene_dict":characters_in_scene_dict,"top_ten_characters_in_scene":top_ten_characters_in_scene,
+                                "speech_sentiment":speech_sentiment,"description_sentiment":description_sentiment,"overall_sentiment":overall_sentiment,
+                                "scene_interaction_dict":scene_interaction_dict,"average_speech_sentence_length":average_speech_sentence_length,
+                                "speech_language_dict":speech_language_dict,"description_language_dict":description_language_dict,
+                                "overall_lanaguage_dict":overall_lanaguage_dict}
 
         return self.scene_info_dict
 
@@ -521,3 +533,4 @@ if __name__ == '__main__':
 
 
     scene.build_data_dict()
+    print(scene.scene_info_dict)
