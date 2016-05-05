@@ -9,7 +9,7 @@ This will then read in a csv file containing data for characters
 There are two main varialbes on this page that may affect data output.
     First is the row count no to break on set in scrape_and_format_page_info. This limits the no of cast members in the dict generated
         Currently set to 25 or first section of credited members
-        
+
     Second is the error margin on the regex fuzzy search. This currently allows for up to 15 insertions and 2 substitutions but tries without subs first
 
 """
