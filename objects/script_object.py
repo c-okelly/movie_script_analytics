@@ -210,11 +210,19 @@ class Script:
         disciription_words_per_min = no_discritption_words / self.imdb_dict.get("Runtime")
         # print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
 
-        # Generate character list
+        ### Current stop point
+        ### Generate character list
         character_dict = self.__generate_dict_of_characters()
 
         # Character info
         no_characters = 0 # Must speak twice to avoid noise
+        # Character gender
+        no_female_characters = 0
+        no_male_characters = 0
+        percentage_of_male_characters = 0
+        percentage_of_female_characters = 0
+
+        # Speaking parts
         no_characters_speak_more_then_5_perent = 0
         no_characters_more_20_percent = 0
         average_character_sentiment = 0
@@ -222,7 +230,13 @@ class Script:
         no_characters_overall_negative = 0
         no_characters_overall_neutral = 0
 
+
+
         # Analysis of sentiment throughout the movie
+
+        # Sentiment totals
+        speech_sentiment = 0
+        description_sentiment =0
         overall_sentiment = 0
 
 
@@ -231,6 +245,8 @@ class Script:
         # Types of words used in the movie => vocab /
 
         # Catagories of language used => adverbs / adjectives
+
+        # No of unique non stop words => vocab measure
 
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
@@ -368,7 +384,7 @@ class Script:
 
         # For external info function => there are formatting requirements;
         # Dict passed should be a hold each character as a sub-dict where the character name is the key
-        # Each sub-dict must contain the following keys and respective vars
+        ### Each sub-dict must contain the following keys and respective vars ### 
         # 1. => "character_name":$char_name 2. => "no_appearances":$no_times_appeared
 
         # Generate Character name / no parts
@@ -379,9 +395,28 @@ class Script:
             else:
                 characters_dict[character_name] = 1
 
-        # Uses function in extre_character_info_for_movie_dict to map character to actor, add the meta critic rating, gender and find imdb character name
+        print(characters_dict)
+        ### Add percentage of speech for each character
+
+
+        ### Sentiment plot for each character and average sentiment => plot will be done by generate average within a range
+
+
+        ### Text analysis of each character and look a no of unique non stop words => vocb
+
+
+        ### Average sentence length
+
+
+        ### Language analysis for all character speech
+
+
+        ### Uses function in extre_character_info_for_movie_dict to map character to actor,
+        # add the meta critic rating, gender and find imdb character name
         updated_dict = (characters_dict) # Not calling to external just yet. Needs testing. Plus create a huge number of external html requests
 
+
+        # Tests
         # print(characters_dict)
         # string = self.__get_string_character_speech("DOM")
         # print(string)
