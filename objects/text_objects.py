@@ -3,6 +3,7 @@
 # from vaderSentiment.vaderSentiment import sentiment as VS
 from nltk import tokenize
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+import nltk
 import re
 from collections import defaultdict
 
@@ -44,13 +45,28 @@ class TextBasedSection:
 
         language_dict = {}
 
-        
+        ### Change if no default tagger used. Info available higher up!
+        language_dict["pos_tagger_used"] = "default_nltk_tagger => Penn Treebank"
 
+        # Tokenize text
+        token_text = nltk.word_tokenize(string_to_be_analysed)
+        token_text = nltk.pos_tag(token_text)
 
+        # Catagories of words => nouns / verb / adjective / adverb / pronouns / modal /
+        for tagged_word in token_text:
+            if language_dict.get(tagged_word[1]):
+                language_dict[tagged_word[1]] += 1
+            else:
+                language_dict[tagged_word[1]] = 1
 
-        return
+        # print(token_text, "\n")
+        # print(nltk.help.upenn_tagset())
 
+        # # Add subdict with key explanations
+        # key_explanations = {'CC':'Coordinating conjunction'},{'CD':'Cardinal number'},{'DT':'Determiner'},{'EX':'Existential there'},{'FW':'Foreign word'},{'IN':'Preposition or subordinating conjunction'},{'JJ':'Adjective'},{'JJR':'Adjective, comparative'},{'JJS':'Adjective, superlative'},{'LS':'List item marker'},{'MD':'Modal'},{'NN':'Noun, singular or mass'},{'NNS':'Noun, plural'},{'NNP':'Proper noun, singular'},{'NNPS':'Proper noun, plural'},{'PDT':'Predeterminer'},{'POS':'Possessive ending'},{'PRP':'Personal pronoun'},{'PRP$':'Possessive pronoun'},{'RB':'Adverb'},{'RBR':'Adverb, comparative'},{'RBS':'Adverb, superlative'},{'RP':'Particle'},{'SYM':'Symbol'},{'TO':'to'},{'UH':'Interjection'},{'VB':'Verb, base form'},{'VBD':'Verb, past tense'},{'VBG':'Verb, gerund or present participle'},{'VBN':'Verb, past participle'},{'VBP':'Verb, non-d person singular present'},{'VBZ':'Verb, d person singular present'},{'WDT':'Wh-determiner'},{'WP':'Wh-pronoun'},{'WP$':'Possessive wh-pronoun'},{'WRB':'Wh-adverb'}
+        # language_dict["key_explanations"] = key_explanations
 
+        return language_dict
 
 
 class Speech(TextBasedSection):
@@ -177,7 +193,7 @@ class Discription(TextBasedSection):
     def __repr__(self):
         return "Discription object form " + str(self.count) + "% way through the movie"
 
-class Scene_change:
+class Scene_change(TextBasedSection):
 
     def __init__(self,text,start_count,change_type):
 
@@ -298,7 +314,7 @@ class Scene_change:
 
         # Scene type => mono / duo / tri / multi
         scene_interaction_dict = self.__determine_scene_interaction_type(top_ten_characters_in_scene)
-        print(scene_interaction_dict)
+        # print(scene_interaction_dict)
 
         # Sentence length for speech
         average_sentence_length_array = []
@@ -312,7 +328,12 @@ class Scene_change:
         # print(average_speech_sentence_length)
 
         ### Language analysis
-
+        # Get strings
+        speech_string = self.return_string_words_in_ob_array(speech_array=1)
+        description_string = self.return_string_words_in_ob_array(description_array=1)
+        # Use function from parent class to perform the analysis
+        speech_language_dict = self.return_language_analysis_dict(speech_string)
+        description_language_dict = self.return_language_analysis_dict(description_string)
 
         # Build scene_info_dict => from all variables above
 
@@ -456,14 +477,17 @@ class Scene_change:
         # Set search arry
         if description_array == 1:
             search_array = self.description_object_array
+            for ob in search_array:
+                word_string += ob.text
+        # Take cleaned text with no names
         elif speech_array == 1:
             search_array = self.speech_object_array
+            for ob in search_array:
+                word_string += ob.cleaned_text
         else:
             search_array = []
             word_string = "No array selected for search"
 
-        for ob in search_array:
-            word_string += ob.text
 
         return word_string
 
