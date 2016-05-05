@@ -193,26 +193,33 @@ class Script:
     # Extract date from moive
     def __extract_data_from_movie(self):
 
-        # Words counts
+        ### Words counts
         total_words = len(re.findall("\w+",self.script))
         # Done with loop to be more accurate and remove all names
         no_speech_words = 0
         for i in self.__speech_object_array:
             no_speech_words += i.no_words
+        no_descritption_words = len(re.findall("\w+",self.return_string_all_discription()))
+        no_scene_change_words = len(re.findall("\w+",self.return_string_all_scene_changes()))
 
-        no_discritption_words = len(re.findall("\w+",self.return_string_all_discription()))
-        precent_of_speech = no_speech_words / total_words
-        precent_of_discription = no_discritption_words / total_words
+        # Get total words that have been captured by the sorting algo => character name / odd sections ommited
+        total_cleaned_words =  no_speech_words + no_descritption_words + no_scene_change_words
 
-        # Words per a minute
+        print(total_words,total_cleaned_words)
+
+        ### Percentages
+        percent_of_speech = no_speech_words / total_cleaned_words
+        percent_of_description = no_descritption_words / total_cleaned_words
+
+        ### Words per a minute
         gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
         speech_words_per_min = no_speech_words / self.imdb_dict.get("Runtime")
-        disciription_words_per_min = no_discritption_words / self.imdb_dict.get("Runtime")
+        description_words_per_min = no_descritption_words / self.imdb_dict.get("Runtime")
         # print(total_words,gen_words_per_min,speech_words_per_min,disciription_words_per_min)
 
         ### Current stop point
         ### Generate character list
-        character_dict = self.__generate_dict_of_characters()
+        character_dict = self.__generate_dict_of_characters(no_speech_words)
 
         # Character info
         no_characters = 0 # Must speak twice to avoid noise
@@ -230,8 +237,6 @@ class Script:
         no_characters_overall_negative = 0
         no_characters_overall_neutral = 0
 
-
-
         # Analysis of sentiment throughout the movie
 
         # Sentiment totals
@@ -239,14 +244,19 @@ class Script:
         description_sentiment =0
         overall_sentiment = 0
 
+        # Dict summaries for Scene
 
         # Averages of speech words in different sections
 
         # Types of words used in the movie => vocab /
 
-        # Catagories of language used => adverbs / adjectives
+        # Categories of language used => adverbs / adjectives
 
         # No of unique non stop words => vocab measure
+
+        # Actors scores
+        score_top_5_actors = 0
+
 
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
@@ -379,29 +389,36 @@ class Script:
             scene_string += scene_ob.text
         return scene_string
 
-    def __generate_dict_of_characters(self):
+    def __generate_dict_of_characters(self,total_speech):
         characters_dict = {}
 
         # For external info function => there are formatting requirements;
         # Dict passed should be a hold each character as a sub-dict where the character name is the key
-        ### Each sub-dict must contain the following keys and respective vars ### 
+        ### Each sub-dict must contain the following keys and respective vars ###
         # 1. => "character_name":$char_name 2. => "no_appearances":$no_times_appeared
 
-        # Generate Character name / no parts
+        # Generate Character name / no parts and store sub dicts in master dict
         for speech_ob in self.__speech_object_array:
             character_name = speech_ob.character
-            if character_name in characters_dict:
-                characters_dict[character_name] = characters_dict[character_name] + 1
+            if characters_dict.get(character_name):
+                currenct_dict = characters_dict.get(character_name)
+                currenct_dict["no_appearances"] += 1
             else:
-                characters_dict[character_name] = 1
+                characters_dict[character_name] = {"character_name":character_name,"no_appearances":1}
 
         print(characters_dict)
+
         ### Add percentage of speech for each character
+        for character in characters_dict:
+            current_char_name = characters_dict.get(character).get("character_name")
+            character_string = self.__get_string_character_speech(current_char_name)
+            # print(character_string)
+            no_words = len(re.findall("\w+",character_string))
 
 
         ### Sentiment plot for each character and average sentiment => plot will be done by generate average within a range
 
-
+                    ###     This Section        ###
         ### Text analysis of each character and look a no of unique non stop words => vocb
 
 
