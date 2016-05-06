@@ -6,10 +6,13 @@ Each object will the run functions of the script to generate data from it.
 This results can then be called by attributes to be put into a csv document
 """
 
-from text_objects import Speech,Scene_change,Discription
+from text_objects import Speech,Scene_change,Discription,TextWorker
 from information_apis import imdb_data_call
 import re
 import operator
+import numpy as np
+import nltk
+import extra_character_info_for_movie_dict
 
 class MoveDataNotFound(Exception):
 
@@ -58,7 +61,6 @@ class Script:
         #     print(i.speech_count)
 
 
-
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + " file name => " + self.file_name
 
@@ -90,6 +92,7 @@ class Script:
 
 
         # Cycle through string list and sort. Call function to create object and add to correct array.
+        # Fine tunning for sorting need here and in the splitter function.
         for text_section in string_list:
 
             # Generate percentage count through script
@@ -206,7 +209,7 @@ class Script:
         # Get total words that have been captured by the sorting algo => character name / odd sections ommited
         total_cleaned_words =  no_speech_words + no_descritption_words + no_scene_change_words
 
-        print(total_words,total_cleaned_words)
+        # print(total_words,total_cleaned_words)
 
         ### Percentages
         percent_of_speech = no_speech_words / total_cleaned_words
@@ -220,7 +223,8 @@ class Script:
 
         ### Current stop point
         ### Generate character list
-        character_dict = self.__generate_dict_of_characters(no_speech_words)
+        imdb_movie_code = self.imdb_dict.get("imdbID")
+        character_dict = self.__generate_dict_of_characters(imdb_movie_code)
 
         # Character info
         no_characters = 0 # Must speak twice to avoid noise
@@ -290,6 +294,10 @@ class Script:
         new_sections_list = []
         temp_section_stirng = ""
 
+
+        ### Algo to recombine all the line together
+        ## => potentially usefull regex to search for sections that is marked after page break informally and continue => ^\s*(\w)?(\d{1,4}){1,5}\sCONTINUED:\s(\(\d{0,4}\))?(\s\d{1,4})?
+        #
         # Check the line is not either empty or all white space
         for line in split_on_empty_line:
             if (re.search("^\s*$",line)): # if line is only white space
@@ -390,7 +398,7 @@ class Script:
             scene_string += scene_ob.text
         return scene_string
 
-    def __generate_dict_of_characters(self,total_speech):
+    def __generate_dict_of_characters(self,imdb_movie_code):
         characters_dict = {}
 
         # For external info function => there are formatting requirements;
@@ -409,41 +417,129 @@ class Script:
 
         # print(characters_dict)
 
-        ### Add percentage of speech for each character
+        ### Add no words for each character
         for character in characters_dict:
             current_char_name = characters_dict.get(character).get("character_name")
             character_string = self.__get_string_character_speech(current_char_name)
             # print(character_string)
             # Get no words and calculate percentage
             no_words_for_char = len(re.findall("\w+",character_string))
+            # Insert
             characters_dict.get(character)["no_words"] = no_words_for_char
 
-        print(characters_dict)
+
+        ### Remove characters that do not have at least 50 words or their names are numbers
+        # Generate new total of speech parts with noise characters removed
+        # Create new characters dict
+        cleaned_characters_dict = {}
+        total_speech_cleaned = 0
+        for character_1 in characters_dict:
+            currenct_dict_1 = characters_dict.get(character_1)
+            current_name_1 = currenct_dict_1.get("character_name")
+            # Check that no words greater then 30 and name is not a number / number starting with letter
+            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1):
+                cleaned_characters_dict[current_name_1] = currenct_dict_1
+                total_speech_cleaned += currenct_dict_1.get("no_words")
+            else:
+                pass
+
+            # elif currenct_dict_1.get("no_words") < 30:
+            #     print(currenct_dict_1, "not enough words \n")
+            # elif re.match("^\w?\d{1,4}$",current_name_1):
+            #     print(currenct_dict_1, "name is a number \n")
+            # else:
+            #     print(currenct_dict_1, "no matches \n")
+
+        ### Add percentage of words from excluding noise eliminated
+        for character_2 in characters_dict:
+            current_dict_2 = characters_dict.get(character_2)
+            no_words_for_char_2 = current_dict_2.get("no_words")
+            try:
+                percentage_of_speech = no_words_for_char_2 / total_speech_cleaned
+            except ZeroDivisionError:
+                percentage_of_speech = 0
+            # Insert info into dict
+            current_dict_2["percent_clean_speech"] = percentage_of_speech
 
         ### Sentiment plot for each character and average sentiment => plot will be done by generate average within a range
 
-                    ###     This Section        ###
-        ### Text analysis of each character and look a no of unique non stop words => vocb
+        for character_3 in cleaned_characters_dict:
+            current_dict_3 = cleaned_characters_dict.get(character_3)
+            char_name_3 = current_dict_3.get("character_name")
+
+            # Get sections of object array for character
+            ###  Variable to set ranges to select   ### ##special_key_value##
+            range_selection = 0.05
+            text_object_in_selected_ranges = []
+
+            for i in np.arange(0,1,range_selection):
+                start = i
+                finish = i + range_selection
+                current_range_3 = self.__get_character_object_by_name_and_range(char_name_3,start,finish)
+                text_object_in_selected_ranges.append(current_range_3)
+
+            # print(text_object_in_selected_ranges, len(text_object_in_selected_ranges))
+            # Use range array to convert into plot
+            sentiment_plot_array = []
+            for sentiment_array in text_object_in_selected_ranges:
+                avg_sent_for_section = self.__return_sentiment_summary_of_array(sentiment_array)
+                sentiment_plot_array.append(avg_sent_for_section)
 
 
-        ### Average sentence length
+            # Calculate over all sentiment for character
+            non_zero_items = 0
+            for i in sentiment_plot_array:
+                if abs(i) > 0:
+                    non_zero_items += 1
+
+            try:
+                over_all_sentiment = sum(sentiment_plot_array) / non_zero_items
+            except ZeroDivisionError:
+                over_all_sentiment = 0
+            # print(char_name_3,over_all_sentiment)
+
+            # # Insert sentiment information into dict
+            current_dict_3["sentiment_plot"] = sentiment_plot_array
+            current_dict_3["sentiment_plot_range"] = range_selection
+            current_dict_3["overall_sentiment"] = over_all_sentiment
+
+                    ###     This Section should use language dict analysis    ###
+        ### Text analysis of each character, no of unique non stop words => vocb, average sentence length
+
+        # Create analysis function
+        analysis_object = TextWorker()
+
+        for character_4 in cleaned_characters_dict:
+            current_dict_4 = cleaned_characters_dict.get(character_4)
+            character_name_4 = current_dict_4.get("character_name")
+
+            character_string_4 = self.__get_string_character_speech(character_name_4)
+
+            language_analysis_dict = analysis_object.return_language_analysis_dict(character_string_4)
+
+            current_dict_4["language_analysis_dict"] = language_analysis_dict
+
+
+
 
 
         ### Language analysis for all character speech
 
+        print("\n",cleaned_characters_dict)
+
+        test_array = []
 
         ### Uses function in extre_character_info_for_movie_dict to map character to actor,
         # add the meta critic rating, gender and find imdb character name
-        updated_dict = (characters_dict) # Not calling to external just yet. Needs testing. Plus create a huge number of external html requests
+        updated_dict = cleaned_characters_dict #extra_character_info_for_movie_dict.add_extra_info_to_current_dict(cleaned_characters_dict,imdb_movie_code)
+        # Not calling to external just yet as creates a huge number of external html requests
 
 
-        # Tests
-        # print(characters_dict)
-        # string = self.__get_string_character_speech("DOM")
-        # print(string)
+        ### Add general script info found => no_cleaned_speech_words
 
         return updated_dict
 
+    ## Not used
     def __get_chracter_info_by_name(self,seach_name):
 
         # Usd as builder for __add_extra_info_to_characters_dict
@@ -473,7 +569,58 @@ class Script:
         # print(return_string)
         return return_string
 
+    def __get_character_object_by_name_and_range(self,name,start_range,finish_range):
 
+        obj_return_array = []
+
+        range_objects = self.return_object_of_type_in_range(start=start_range,finish=finish_range,speech_normal_count=1)
+
+        for obj in range_objects:
+            if obj.character == name:
+                obj_return_array.append(obj)
+
+        return obj_return_array
+
+    def __return_sentiment_summary_of_array(self,sentiment_array):
+
+        no_non_zero_values = 0
+        running_total_sentiment = 0
+
+        # print(sentiment_array)
+
+        if len(sentiment_array) > 0:
+            for text_ob in sentiment_array:
+                current_sentiment = text_ob.sentiment
+                if abs(current_sentiment) > 0:
+                    no_non_zero_values += 1
+                    running_total_sentiment += current_sentiment
+        else:
+            average_sentiment = 0
+
+        try:
+            average_sentiment = running_total_sentiment / no_non_zero_values
+        except ZeroDivisionError:
+            average_sentiment = 0
+
+        return average_sentiment
+
+    ## To be used for refatoring of character analysis
+    def __carry_out_sentiment_analysis(self):
+        pass
+
+    def __word_analysis(self,string_to_be_analysed):
+
+        default_stopwords = set(nltk.corpus.stopwords.words('english'))
+
+        # Tokenize all words
+        token_words = nltk.word_tokenize(string_to_be_analysed)
+
+        # Remove words shorted then 1
+        token_words = [word for word in token_words if not len(word) > 1]
+        # Remove numbers
+        token_words = [word for word in token_words if not word.isnumeric()]
+        # Lower case all words
+        token_words = [word for word in token_words if ]
 
     # This will attempt to capture the level of error that has occoured
     def generate_error_report(self):
@@ -498,6 +645,8 @@ if __name__ == '__main__':
 
     # try:
     test_script = Script(text_file,"12-Years-a-Slave.txt")
+
+    print("Done!")
 
     # except Exception as e:
     #     print(e)

@@ -1,6 +1,7 @@
 import re
 
 import text_objects
+import numpy as np
 
 # f = open("Data/scripts_text/17-Again.txt", 'r')
 # text = f.read()
@@ -58,38 +59,10 @@ import text_objects
 
 if __name__ == '__main__':
 
-    # dog_array = []
     #
-    # dog = text_objects.Speech("Hello",0.4)
-    # dog_array.append(dog)
-    # dog = text_objects.Speech("cat",0.5)
-    # dog_array.append(dog)
-    # dog = text_objects.Speech("DOG \n yello",0.6)
-    # dog_array.append(dog)
-    #
-    # for i in dog_array:
-    #     print(i)
-    #
-    # new_array = []
-    #
-    # for i in dog_array:
-    #     if i.count >= 0.5:
-    #         new_array.append(i)
-    #
-    # print(new_array)
+    # string = "           -EARLY APRIL, 1841"
+    # print(re.match("^\s+-(\w+\s{0,3},?/?){0,4}(\s\d{0,5})-\s+",string))
 
-    # d = {"John":1}
-    #
-    # x = ["John","David","John","James","Silly"]
-    # for i in x:
-    #     if d.get(i):
-    #         d[i] += 1
-    #     else:
-    #         d[i] = 1
-    #
-    # print(d)
-
-    string = "           -EARLY APRIL, 1841"
-    print(string)
-    print(re.match("^\s+-(\w+\s{0,3},?/?){0,4}(\s\d{0,5})-\s+",string))
+    for i in np.arange(0,1,0.1):
+        print(i,"to",i+0.1)
 
