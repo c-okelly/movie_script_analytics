@@ -504,7 +504,7 @@ class Scene_change(TextBasedSection):
         return word_string
 
 class TextWorker(TextBasedSection):
-    ### Classed used to access funcitons in class => TextBasedSection
+    ### Class used to access functions in class => TextBasedSection
 
     def __init__(self):
         pass

@@ -270,7 +270,7 @@ class Script:
                 no_unknown_genders += 1
                 unknown_gender_words += no_words
 
-        print(no_characters, no_female_characters,no_male_characters,no_unknown_genders)
+        # print(no_characters, no_female_characters,no_male_characters,no_unknown_genders)
 
         ## Calculate percent of words spoken in each parts
         # Zero division error
@@ -370,7 +370,7 @@ class Script:
 
         average_speech_sentiment = self.__average_of_non_zeros_in_array(sentiment_plot_of_speech)
         average_description_sentiment = self.__average_of_non_zeros_in_array(sentiment_plot_of_description)
-        overall_sentiment = self.__average_of_non_zeros_in_array(overall_sentiment_plot)
+        average_overall_sentiment = self.__average_of_non_zeros_in_array(overall_sentiment_plot)
 
         # print(average_speech_sentiment,average_description_sentiment,overall_sentiment)
 
@@ -450,10 +450,69 @@ class Script:
         ## Create info dict
 
         # print(self.character_dict)
-        print(self.scene_dict)
+        # print(self.scene_dict)
 
-        self.info_dict = {
-
+        self.info_dict = {"total_words":total_words,
+                          "tota_caputred_words":total_captured_words,
+                          "no_speech_words":no_speech_words,
+                          "no_description_words":no_descritption_words,
+                          "no_scene_change_words":no_scene_change_words,
+                          "no_significant_char_words_per_mins":no_significant_char_speech_words,
+                          # Percentages
+                          "percent_speech":percent_of_speech,
+                          "percent_descriptoin":percent_of_description,
+                          # WPM
+                          "words_per_min":gen_words_per_min,
+                          "speech_wpm":speech_words_per_min,
+                          "description_wpm":description_words_per_min,
+                          # IMDB code
+                          "imdb_code":imdb_movie_code,
+                          # Gender general
+                          "no_characters":no_characters,
+                          "no_female_chars":no_female_characters,
+                          "no_male_chars":no_male_characters,
+                          "no_unknown_char_gender":no_unknown_genders,
+                          "no_female_words":female_words_spoken,
+                          "no_male_words":male_words_spoken,
+                          "no_unknown_gender_words":unknown_gender_words,
+                          # Gender analysis
+                          "percent_male_chars":percent_male_chars,
+                          "percent_female_chars":percent_female_chars,
+                          "percent_unknown_chars":percent_unknown_chars,
+                          "percent_male_words":percent_male_words,
+                          "percent_female_words":percent_female_words,
+                          "percent_unknown_words":percent_unknown_words,
+                          # Speaking
+                          "chars_speach_no_then_5_percent":no_chars_speak_more_5_perent,
+                          "chars_speach_no_then_10_percent":no_chars_speak_more_10_perent,
+                          "chars_speach_no_then_20_percent":no_chars_speak_more_20_percent,
+                          # Average score
+                          "average_meta_critic_score":actor_average_meta_score,
+                          # Average top 5 score
+                          "top_5_meta_critic_score":average_meta_critic_for_top_5,
+                          # Character sentiment
+                          "no_positive_chars":no_characters_overall_positive,
+                          "no_negative_chars":no_characters_overall_negative,
+                          "no_neutral_chars":no_characters_overall_neutral,
+                          # Mapping levels
+                          "no_characters_not_mapped":no_chars_not_mapped,
+                          "percent_chars_not_mapped":percent_chars_not_mapped,
+                          # Sentiment plots
+                          "speech_sent_plot":sentiment_plot_of_speech,
+                          "description_sent_plot":sentiment_plot_of_description,
+                          "overall_sentiment_plot":overall_sentiment_plot,
+                          "average_speech_sent":average_speech_sentiment,
+                          "average_description_sent":average_description_sentiment,
+                          "average_overall_sent":average_overall_sentiment,
+                          # Scenes
+                          "no_scenes":no_scenes,
+                          "no_description_only_scenes":no_description_only_scene,
+                          "no_mixed_scenes":no_mixed_scenes,
+                          "no_scenes_1_main_char":no_scene_only_1_main_char,
+                          "no_scenes_2_main_chars":no_scene_only_2_main_char,
+                          # Language analysis
+                          "speech_language_dict":speech_language_dict,
+                          "description_language_dict":description_language_dict
         }
 
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
