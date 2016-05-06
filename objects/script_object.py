@@ -410,7 +410,10 @@ class Script:
                 running_score += int(score)
                 non_zero_scores += 1
 
-        average_meta_critic_for_top_5 = running_score/non_zero_scores
+        try:
+            average_meta_critic_for_top_5 = running_score/non_zero_scores
+        except ZeroDivisionError:
+            average_meta_critic_for_top_5 = 0
 
         # Dict summaries for Scene
         no_scenes = len(self.__description_object_array)

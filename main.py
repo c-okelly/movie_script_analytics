@@ -54,8 +54,8 @@ def main():
             failed_objects.append([file_name,"IMDB dict failure"])
             count += 1
         except Exception as E:
-            print("File ",file_name,"could not be converted into an ojbect")
-            failed_objects.append([file_name],E)
+            print("File ",file_name,"could not be converted into an ojbect. Error was ",E)
+            failed_objects.append([file_name,E])
             count += 1
 
     print(len(finished_objects))

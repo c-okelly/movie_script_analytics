@@ -58,7 +58,8 @@ def retieve_person_score(search_name):
 
     except urllib.error.HTTPError as err:
         if err.code == 404:
-            print("404 page not found errror for search term => " + search_name)
+            # print("404 page not found errror for search term => " + search_name)
+            pass
         else:
             print(err.code + "error for search term => " + search_name)
         return 0
