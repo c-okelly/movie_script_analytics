@@ -194,7 +194,7 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
                 search_object = regex.search(r"!("+script_character_name+"){i<=1}!",character_string, regex.BESTMATCH)
 
                 print(search_object, script_character_name)
-            elif search_object == None: # Allow search for substring with deletions
+            if search_object == None: # Allow search for substring with deletions
                 search_object = regex.search(r"!("+script_character_name+"){d<=2}!",character_string , regex.BESTMATCH)
                 print(search_object, script_character_name, "3")
 
