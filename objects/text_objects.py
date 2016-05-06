@@ -363,7 +363,7 @@ class Scene_change(TextBasedSection):
                 interaction_dict["percentage_of_scene"] = top_characters_array[0][1]
 
             # If 2 combined more then 80 % => Two people
-            elif (top_characters_array[0][1] + top_characters_array[1][1]) > 0.85:
+            elif len(top_characters_array) > 1 and (top_characters_array[0][1] + top_characters_array[1][1]) > 0.85:
                 interaction_dict["one_main_character"] = 0
                 interaction_dict["two_main_character"] = 1
                 interaction_dict["multiple_characters"] = 0
