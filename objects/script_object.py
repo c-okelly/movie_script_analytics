@@ -58,6 +58,8 @@ class Script:
         if self.imdb_dict != None:
             self.__extract_data_from_movie()
 
+        print("Script object ",movie_file_name,"has succesfully finished")
+
         # Testing
         # print(len(self.__speech_object_array),len(self.__description_object_array),len(self.__scene_object_array))
         # for i in self.__speech_object_array:
