@@ -336,8 +336,10 @@ class Script:
             if score != 0 and score is not None:
                 total_score += int(score)
                 count += 1
-
-        actor_average_meta_score = total_score / count
+        try:
+            actor_average_meta_score = total_score / count
+        except:
+            actor_average_meta_score = 0
 
         ### Sentiment ###
 
@@ -979,12 +981,12 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/Avengers,-The.txt") as file:
+    with open("../Data/scripts_text/12.txt") as file:
         text_file = file.read()
 
 
     # try:
-    test_script = Script(text_file,"Avengers,-The.txt")
+    test_script = Script(text_file,"12.txt")
 
     print("Done!")
 

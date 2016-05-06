@@ -211,7 +211,7 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
             if closest_character_match.count("!")<= 2:
                 closest_character_match = closest_character_match.replace("!","")
             else:
-                print("Doulbe match. Error from extra_character_info_file combine function",closest_character_match,script_character_name)
+                # print("Doulbe match. Error from extra_character_info_file combine function",closest_character_match,script_character_name)
                 closest_character_match = None
         except:
             closest_character_match = None
