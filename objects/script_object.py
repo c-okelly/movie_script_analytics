@@ -436,8 +436,8 @@ class Script:
         for character_1 in characters_dict:
             currenct_dict_1 = characters_dict.get(character_1)
             current_name_1 = currenct_dict_1.get("character_name")
-            # Check that no words greater then 30 and name is not a number / number starting with letter
-            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1):
+            # Check that no words greater then 30 and name is not a number / number starting with letter and that at least 2 apperances
+            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1) and currenct_dict_1.get("no_appearances") >= 2:
                 cleaned_characters_dict[current_name_1] = currenct_dict_1
                 total_speech_cleaned += currenct_dict_1.get("no_words")
             else:
@@ -512,26 +512,27 @@ class Script:
         for character_4 in cleaned_characters_dict:
             current_dict_4 = cleaned_characters_dict.get(character_4)
             character_name_4 = current_dict_4.get("character_name")
-
+            # Get character string
             character_string_4 = self.__get_string_character_speech(character_name_4)
-
+            # Get language analysis dict
             language_analysis_dict = analysis_object.return_language_analysis_dict(character_string_4)
 
+            # Carry out frequency dist calculation
+            frequency_of_non_stop_words = self.__word_count_analysis(character_string_4)
+
+            # print(character_name_4,frequency_of_non_stop_words)
+            # Insert information into dict
             current_dict_4["language_analysis_dict"] = language_analysis_dict
+            current_dict_4["freq_of_non_stop_words"] = frequency_of_non_stop_words
 
 
-
-
-
-        ### Language analysis for all character speech
-
-        print("\n",cleaned_characters_dict)
+        #print("\n",cleaned_characters_dict)
 
         test_array = []
 
         ### Uses function in extre_character_info_for_movie_dict to map character to actor,
         # add the meta critic rating, gender and find imdb character name
-        updated_dict = cleaned_characters_dict #extra_character_info_for_movie_dict.add_extra_info_to_current_dict(cleaned_characters_dict,imdb_movie_code)
+        updated_dict = extra_character_info_for_movie_dict.add_extra_info_to_current_dict(cleaned_characters_dict,imdb_movie_code)
         # Not calling to external just yet as creates a huge number of external html requests
 
 
@@ -608,7 +609,7 @@ class Script:
     def __carry_out_sentiment_analysis(self):
         pass
 
-    def __word_analysis(self,string_to_be_analysed):
+    def __word_count_analysis(self,string_to_be_analysed,length_frequency_array=10):
 
         default_stopwords = set(nltk.corpus.stopwords.words('english'))
 
@@ -616,11 +617,25 @@ class Script:
         token_words = nltk.word_tokenize(string_to_be_analysed)
 
         # Remove words shorted then 1
-        token_words = [word for word in token_words if not len(word) > 1]
+        token_words = [word for word in token_words if len(word) > 2]
         # Remove numbers
         token_words = [word for word in token_words if not word.isnumeric()]
         # Lower case all words
-        token_words = [word for word in token_words if ]
+        token_words = [word.lower() for word in token_words]
+        # Remove stop words
+        non_stop_words = [word for word in token_words if word not in default_stopwords]
+
+        word_f_dist = nltk.FreqDist(non_stop_words)
+
+
+        # Get top 10 words => default 10
+        most_frequent_words = []
+        for word, frequency in word_f_dist.most_common(length_frequency_array):
+            most_frequent_words.append([word,frequency])
+        # print(most_frequent_words)
+
+        return most_frequent_words
+
 
     # This will attempt to capture the level of error that has occoured
     def generate_error_report(self):
