@@ -63,7 +63,6 @@ class Script:
         # for i in self.__speech_object_array:
         #     print(i.speech_count)
 
-
     def __repr__(self):
         return "Moive script object of => " + self.movie_title + " file name => " + self.file_name
 
@@ -201,7 +200,6 @@ class Script:
             count += 1
             self.scene_dict[scene_no] = scene_dict
 
-
     # Extract date from moive
     def __extract_data_from_movie(self):
 
@@ -215,13 +213,13 @@ class Script:
         no_scene_change_words = len(re.findall("\w+",self.return_string_all_scene_changes()))
 
         # Get total words that have been captured by the sorting algo => character name / odd sections ommited
-        total_cleaned_words =  no_speech_words + no_descritption_words + no_scene_change_words
+        total_captured_words = no_speech_words + no_descritption_words + no_scene_change_words
 
         # print(total_words,total_cleaned_words)
 
         ### Percentages
-        percent_of_speech = no_speech_words / total_cleaned_words
-        percent_of_description = no_descritption_words / total_cleaned_words
+        percent_of_speech = no_speech_words / total_captured_words
+        percent_of_description = no_descritption_words / total_captured_words
 
         ### Words per a minute
         gen_words_per_min = total_words / self.imdb_dict.get("Runtime")
@@ -233,7 +231,7 @@ class Script:
         ### Generate character list
         imdb_movie_code = self.imdb_dict.get("imdbID")
         character_dict = self.__generate_dict_of_characters(imdb_movie_code)
-        no_cleaned_speech_words = character_dict.get("no_cleaned_speech_words")
+        no_significant_char_speech_words = character_dict.get("no_cleaned_speech_words")
         # Remove item form dict as causes errors
         del character_dict["no_cleaned_speech_words"]
         # del character_dict["no_cleaned_speech_words"]
@@ -272,7 +270,8 @@ class Script:
                 no_unknown_genders += 1
                 unknown_gender_words += no_words
 
-        # print(no_characters, no_female_characters,no_male_characters,no_unknown_genders)
+        print(no_characters, no_female_characters,no_male_characters,no_unknown_genders)
+
         ## Calculate percent of words spoken in each parts
         # Zero division error
         try:
@@ -289,19 +288,19 @@ class Script:
             percent_unknown_chars = 0
         # Percentages
         try:
-            percent_male_words = male_words_spoken / no_cleaned_speech_words
+            percent_male_words = male_words_spoken / no_significant_char_speech_words
         except ZeroDivisionError:
             percent_male_words = 0
         try:
-            percent_female_words = female_words_spoken / no_cleaned_speech_words
+            percent_female_words = female_words_spoken / no_significant_char_speech_words
         except ZeroDivisionError:
             percent_female_words = 0
         try:
-            percent_unknown_words = unknown_gender_words / no_cleaned_speech_words
+            percent_unknown_words = unknown_gender_words / no_significant_char_speech_words
         except ZeroDivisionError:
             percent_unknown_words = 0
 
-        # print(percent_male_chars,percent_female_chars,percent_unknown_chars,percent_male_words,percent_female_words,percent_unknown_words)
+        # print(percent_male_chars,percent_female_chars,percent_unknown_chars)
 
 
         # Speaking parts
@@ -416,7 +415,6 @@ class Script:
         no_description_only_scene = 0
         no_mixed_scenes = no_scenes - no_description_only_scene
 
-        average_length_array = []
         no_scene_only_1_main_char = 0
         no_scene_only_2_main_char = 0
 
@@ -425,13 +423,13 @@ class Script:
             scene_info_dict = scene.scene_info_dict
 
             # Scene type
-            scene_only_description = scene_info_dict.get()
+            scene_only_description = scene_info_dict.get("scene_only_description")
             if scene_only_description == 1:
                 no_description_only_scene += 1
 
             # Scene interaction type
-            scene_1_main = scene_info_dict.get()
-            scene_2_main = scene_info_dict.get()
+            scene_1_main = scene_info_dict.get("scene_interaction_dict").get("one_main_character")
+            scene_2_main = scene_info_dict.get("scene_interaction_dict").get("two_main_character")
             if scene_1_main == 1:
                 no_scene_only_1_main_char += 1
             elif scene_2_main == 1:
@@ -451,7 +449,7 @@ class Script:
         self.character_dict = character_dict
         ## Create info dict
 
-        print(self.character_dict)
+        # print(self.character_dict)
         print(self.scene_dict)
 
         self.info_dict = {
@@ -624,7 +622,7 @@ class Script:
             characters_dict.get(character)["no_words"] = no_words_for_char
 
 
-        ### Remove characters that do not have at least 50 words or their names are numbers
+        ### Remove characters that do not have at least 30 words or their names are numbers
         # Generate new total of speech parts with noise characters removed
         # Create new characters dict
         cleaned_characters_dict = {}
@@ -634,7 +632,7 @@ class Script:
             currenct_dict_1 = characters_dict.get(character_1)
             current_name_1 = currenct_dict_1.get("character_name")
             # Check that no words greater then 30 and name is not a number / number starting with letter and that at least 2 apperances
-            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1) and currenct_dict_1.get("no_appearances") >= 2:
+            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1): # and currenct_dict_1.get("no_appearances") >= 2:
                 cleaned_characters_dict[current_name_1] = currenct_dict_1
                 total_speech_cleaned += currenct_dict_1.get("no_words")
             else:
