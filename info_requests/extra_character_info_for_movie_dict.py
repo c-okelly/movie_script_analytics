@@ -56,8 +56,8 @@ def scrape_and_format_page_info(imdb_code):
         row = only_rows[i]
         row_count += 1
         # Break loop when table row get down to uncredited cast members or after first 25 cast members
-        if len(row) == 1 or row_count > 25:
-            break
+        if len(row) == 1:# or row_count > 25:
+            pass
 
         else:
             # Find all individual cells in current row
@@ -75,13 +75,17 @@ def scrape_and_format_page_info(imdb_code):
 
 
             # Create new character dict
-            single_character = {"actor_name":actor_name,"actor_link_code":actor_link_code}
+            single_character = {"actor_name":actor_name.strip(),"actor_link_code":actor_link_code}
 
             # Add character name and links for each character
             count = 0
             for i in character_name:
-                char_name = "character_name_" + str(count)
-                single_character[char_name] = character_name[count].replace("(voice)","").strip().upper() # Remove voice information
+                char_name = "character_name_" + str(count).strip()
+                name_to_inset = character_name[count].strip().upper()
+                # print(name_to_inset)
+                name_to_inset = re.sub("\((\s*\w+)*\)","",name_to_inset)# Remove information in brackets
+                # print(name_to_inset)
+                single_character[char_name] = name_to_inset # Remove voice information
                 char_link = "character_link_" + str(count)
                 # Try as some character my not have links
                 try:
@@ -96,13 +100,13 @@ def scrape_and_format_page_info(imdb_code):
 
             for i in range(len(character_name)):
                 # Add character dict to multiple char dict.
-                name = single_character.get("character_name_" + str(i))
+                name = single_character.get("character_name_" + str(i)).strip()
                 character_dict[name] = single_character # Whole name
 
             # print(single_character.get("actor_name"),single_character.get("character_name_0"))
 
     character_dict['list_of_characters'] = list_of_characters
-
+    print(character_dict)
     return character_dict
 
 def add_gender_and_meta_critic_info(character_dict): # Add extra info to the dicts. Using sqllite db to minimise number of calls
@@ -165,19 +169,29 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
     # Take the list of character and turn into single string with ! before and after every character.
     # Had used , but might cause errors later
     character_list = imdb_actor_info_dict.get("list_of_characters")
-    character_string = "!" + "!".join(character_list) + "!"
+    cleaned_character_list = []
+    for char in character_list:
+        cleaned_char = re.sub("\((\s*\w+.)*\){1,5}","",char).strip() # Remove information in brackets
+        cleaned_character_list.append(cleaned_char)
 
+    character_string = "!" + "!".join(cleaned_character_list) + "!"
+    # print(cleaned_character_list)
     finished_combined_dict = {}
 
     for char_dict in basic_dict:
 
         # Set name equal to current character name. Use long character string to perform fuzzy regex search.
         script_character_name = basic_dict.get(char_dict).get("character_name")
+        if not re.search("^\w?\d{1,4}",script_character_name.strip()): # Ensure character name is not only numbers => normally an error on sortings
+            search_object = regex.search(r"!("+script_character_name+"){i<=15}!",character_string , regex.BESTMATCH) # Only insertions
+            # print(script_character_name)
+            #### Commented out as was adding noise only ####
+            # if search_object == None: # If nothing found allows substitutions
+            #     search_object = regex.search(r"!("+script_character_name+"){i<=10,s<=2}!",character_string , regex.BESTMATCH)
+        else:
+            search_object = None
 
-        search_object = regex.search(r"!("+script_character_name+"){i<=15}!",character_string , regex.BESTMATCH) # Only insertions
-        # If nothing found allows substitutions
-        if search_object == None:
-            search_object = regex.search(r"!("+script_character_name+"){i<=10,s<=2}!",character_string , regex.BESTMATCH)
+        # print(script_character_name,search_object)
 
         # Try set result string as best match. If failed set as none
         try:
@@ -197,7 +211,7 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
 
         basic_dict_copy = basic_dict.get(char_dict)
         correct_imdb_dict = imdb_actor_info_dict.get(closest_character_match)
-        # print(correct_imdb_dict)
+        # print(imdb_actor_info_dict)
 
         ###         Add to this section to change what information is combined into the final dict
         ###
@@ -206,6 +220,7 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
             # Merge imdb into basic
             actor_name = correct_imdb_dict.get("actor_name")
             actor_link_code = correct_imdb_dict.get("actor_link_code")
+            # Insert into into
             basic_dict_copy["actor_name"] = actor_name
             basic_dict_copy["actor_link_code"] = actor_link_code
 
@@ -239,7 +254,8 @@ def add_extra_info_to_current_dict(basic_character_dict,imdb_movie_code):
 
     partical_extened_dict = combine_dicts_together(basic_character_dict,imdb_scrape_dict)
 
-    completed_extened_dict = add_gender_and_meta_critic_info(partical_extened_dict)
+    ## Add extra info => currently commented out
+    completed_extened_dict = partical_extened_dict #add_gender_and_meta_critic_info(partical_extened_dict)
 
     return completed_extened_dict
 
