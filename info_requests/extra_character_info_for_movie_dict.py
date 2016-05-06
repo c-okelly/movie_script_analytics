@@ -188,6 +188,17 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
             #### Commented out as was adding noise only ####
             # if search_object == None: # If nothing found allows substitutions
             #     search_object = regex.search(r"!("+script_character_name+"){i<=10,s<=2}!",character_string , regex.BESTMATCH)
+
+            if search_object == None and len(script_character_name.split(" ")) >= 2: # Seach using first half word and then second half
+                script_character_name = script_character_name.split(" ")[0]
+                search_object = regex.search(r"!("+script_character_name+"){i<=1}!",character_string, regex.BESTMATCH)
+
+                print(search_object, script_character_name)
+            elif search_object == None: # Allow search for substring with deletions
+                search_object = regex.search(r"!("+script_character_name+"){d<=2}!",character_string , regex.BESTMATCH)
+                print(search_object, script_character_name, "3")
+
+
         else:
             search_object = None
 
@@ -255,7 +266,7 @@ def add_extra_info_to_current_dict(basic_character_dict,imdb_movie_code):
     partical_extened_dict = combine_dicts_together(basic_character_dict,imdb_scrape_dict)
 
     ## Add extra info => currently commented out
-    completed_extened_dict = partical_extened_dict #add_gender_and_meta_critic_info(partical_extened_dict)
+    completed_extened_dict = add_gender_and_meta_critic_info(partical_extened_dict)
 
     return completed_extened_dict
 
