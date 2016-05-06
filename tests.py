@@ -63,6 +63,10 @@ if __name__ == '__main__':
     # string = "           -EARLY APRIL, 1841"
     # print(re.match("^\s+-(\w+\s{0,3},?/?){0,4}(\s\d{0,5})-\s+",string))
 
-    for i in np.arange(0,1,0.1):
-        print(i,"to",i+0.1)
+    # for i in np.arange(0,1,0.1):
+    #     print(i,"to",i+0.1)
+
+    array= [1,3,5,6,1]
+
+    count = 0
 

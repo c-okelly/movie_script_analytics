@@ -225,35 +225,108 @@ class Script:
         ### Generate character list
         imdb_movie_code = self.imdb_dict.get("imdbID")
         character_dict = self.__generate_dict_of_characters(imdb_movie_code)
+        no_cleaned_speech_words = character_dict.get("no_cleaned_speech_words")
+        print(character_dict)
 
         # Character info
-        no_characters = 0 # Must speak twice to avoid noise
+        no_characters = len(character_dict) # Must speak twice to avoid noise
         # Character gender
         no_female_characters = 0
+        female_words_spoken = 0
         no_male_characters = 0
-        percentage_of_male_characters = 0
-        percentage_of_female_characters = 0
+        male_words_spoken = 0
+        no_unknown_genders = 0
+        unknown_gender_words = 0
+
+        # Count gender
+        for character in character_dict:
+            # Get gender. Skip if int returned instead of a dict. As one dict used to store general information
+            try:
+                gender = character_dict.get(character).get("gender")
+                no_words = character_dict.get(character).get("no_words")
+            except AttributeError:
+                gender = "list_array"
+                no_words = 0
+
+            # print(gender)
+            if gender == "M":
+                no_male_characters += 1
+                male_words_spoken += no_words
+            elif gender == "F":
+                no_female_characters += 1
+                female_words_spoken += no_words
+            elif gender is None:
+                no_unknown_genders += 1
+                unknown_gender_words += no_words
+
+        print(no_characters, no_female_characters,no_male_characters,no_unknown_genders)
+        ## Calculate percent of words spoken in each parts
+        # Zero division error
+        try:
+            percent_male_chars = no_male_characters / no_characters
+        except ZeroDivisionError:
+            percent_male_chars = 0
+        try:
+            percent_female_chars = no_female_characters / no_characters
+        except ZeroDivisionError:
+            percent_female_chars = 0
+        try:
+            percent_unknown_chars = no_unknown_genders / no_characters
+        except ZeroDivisionError:
+            percent_unknown_chars = 0
+        # Percentages
+        try:
+            percent_male_words = male_words_spoken / no_cleaned_speech_words
+        except ZeroDivisionError:
+            percent_male_words = 0
+        try:
+            percent_female_words = female_words_spoken / no_cleaned_speech_words
+        except ZeroDivisionError:
+            percent_female_words = 0
+        try:
+            percent_unknown_words = unknown_gender_words / no_cleaned_speech_words
+        except ZeroDivisionError:
+            percent_unknown_words = 0
+
+        print(percent_male_chars,percent_female_chars,percent_unknown_chars,percent_male_words,percent_female_words,percent_unknown_words)
+
 
         # Speaking parts
-        no_characters_speak_more_then_5_perent = 0
-        no_characters_more_20_percent = 0
-        average_character_sentiment = 0
+        no_chars_speak_more_5_perent = 0
+        no_chars_speak_more_10_perent = 0
+        no_chars_speak_more_20_percent = 0
+
+        for character_1 in character_dict:
+            current_char_percentage = character_dict.get(character_1).get("")
+            if current_char_percentage >= 0.05:
+                no_chars_speak_more_5_perent += 1
+            if current_char_percentage >= 0.1:
+                no_chars_speak_more_10_perent += 1
+            if current_char_percentage >= 0.2:
+                no_chars_speak_more_20_percent += 1
+
+
+        ### Sentiment
+        average_speech_sentiment = 0
+        average_description_sentiment = 0
+        overall_sentiment = 0
+
+        # Character sentiment
         no_characters_overall_positive = 0
         no_characters_overall_negative = 0
         no_characters_overall_neutral = 0
 
         # Analysis of sentiment throughout the movie
+        sentiment_plot_of_speech = 0
+        sentiment_plot_of_description = 0
+        overall_sentiment_plot = 0
 
-        # Sentiment totals
-        speech_sentiment = 0
-        description_sentiment =0
-        overall_sentiment = 0
+        # Top 5 character dicts
+        
 
         # Dict summaries for Scene
 
         # Averages of speech words in different sections
-
-        # Types of words used in the movie => vocab /
 
         # Categories of language used => adverbs / adjectives
 
@@ -433,6 +506,7 @@ class Script:
         # Create new characters dict
         cleaned_characters_dict = {}
         total_speech_cleaned = 0
+
         for character_1 in characters_dict:
             currenct_dict_1 = characters_dict.get(character_1)
             current_name_1 = currenct_dict_1.get("character_name")
@@ -470,38 +544,9 @@ class Script:
             # Get sections of object array for character
             ###  Variable to set ranges to select   ### ##special_key_value##
             range_selection = 0.05
-            text_object_in_selected_ranges = []
 
-            for i in np.arange(0,1,range_selection):
-                start = i
-                finish = i + range_selection
-                current_range_3 = self.__get_character_object_by_name_and_range(char_name_3,start,finish)
-                text_object_in_selected_ranges.append(current_range_3)
+            sent = self.__get_sentiment_plot_and_overall_sentiment(current_dict_3,char_name_3,range_selection)
 
-            # print(text_object_in_selected_ranges, len(text_object_in_selected_ranges))
-            # Use range array to convert into plot
-            sentiment_plot_array = []
-            for sentiment_array in text_object_in_selected_ranges:
-                avg_sent_for_section = self.__return_sentiment_summary_of_array(sentiment_array)
-                sentiment_plot_array.append(avg_sent_for_section)
-
-
-            # Calculate over all sentiment for character
-            non_zero_items = 0
-            for i in sentiment_plot_array:
-                if abs(i) > 0:
-                    non_zero_items += 1
-
-            try:
-                over_all_sentiment = sum(sentiment_plot_array) / non_zero_items
-            except ZeroDivisionError:
-                over_all_sentiment = 0
-            # print(char_name_3,over_all_sentiment)
-
-            # # Insert sentiment information into dict
-            current_dict_3["sentiment_plot"] = sentiment_plot_array
-            current_dict_3["sentiment_plot_range"] = range_selection
-            current_dict_3["overall_sentiment"] = over_all_sentiment
 
                     ###     This Section should use language dict analysis    ###
         ### Text analysis of each character, no of unique non stop words => vocb, average sentence length
@@ -528,7 +573,6 @@ class Script:
 
         #print("\n",cleaned_characters_dict)
 
-        test_array = []
 
         ### Uses function in extre_character_info_for_movie_dict to map character to actor,
         # add the meta critic rating, gender and find imdb character name
@@ -537,6 +581,8 @@ class Script:
 
 
         ### Add general script info found => no_cleaned_speech_words
+
+        updated_dict["no_cleaned_speech_words"] = total_speech_cleaned
 
         return updated_dict
 
@@ -606,8 +652,39 @@ class Script:
         return average_sentiment
 
     ## To be used for refatoring of character analysis
-    def __carry_out_sentiment_analysis(self):
-        pass
+    def __get_sentiment_plot_and_overall_sentiment(self,current_dict_3,char_name_3,range_selection):
+        text_object_in_selected_ranges = []
+
+        for i in np.arange(0,1,range_selection):
+            start = i
+            finish = i + range_selection
+            current_range_3 = self.__get_character_object_by_name_and_range(char_name_3,start,finish)
+            text_object_in_selected_ranges.append(current_range_3)
+
+        # print(text_object_in_selected_ranges, len(text_object_in_selected_ranges))
+        # Use range array to convert into plot
+        sentiment_plot_array = []
+        for sentiment_array in text_object_in_selected_ranges:
+            avg_sent_for_section = self.__return_sentiment_summary_of_array(sentiment_array)
+            sentiment_plot_array.append(avg_sent_for_section)
+
+
+        # Calculate over all sentiment for character
+        non_zero_items = 0
+        for i in sentiment_plot_array:
+            if abs(i) > 0:
+                non_zero_items += 1
+
+        try:
+            over_all_sentiment = sum(sentiment_plot_array) / non_zero_items
+        except ZeroDivisionError:
+            over_all_sentiment = 0
+        # print(char_name_3,over_all_sentiment)
+
+        # # Insert sentiment information into dict
+        current_dict_3["sentiment_plot"] = sentiment_plot_array
+        current_dict_3["sentiment_plot_range"] = range_selection
+        current_dict_3["overall_sentiment"] = over_all_sentiment
 
     def __word_count_analysis(self,string_to_be_analysed,length_frequency_array=10):
 
@@ -635,7 +712,6 @@ class Script:
         # print(most_frequent_words)
 
         return most_frequent_words
-
 
     # This will attempt to capture the level of error that has occoured
     def generate_error_report(self):
