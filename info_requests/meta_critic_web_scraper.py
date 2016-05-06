@@ -21,7 +21,7 @@ class MetaCriticRequestFailed(Exception):
 def retieve_person_score(search_name):
 
     # Format search term
-    search_name_formated = search_name.lower().replace(" ", "-")
+    search_name_formated = search_name.lower().replace(" ", "-").replace(".","")
     normalise_name = str(unicodedata.normalize('NFKD', search_name_formated).encode('ascii','ignore'))
     strip_encoding = normalise_name[1:].replace("'","")
 
