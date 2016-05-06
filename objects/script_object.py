@@ -632,7 +632,7 @@ class Script:
             currenct_dict_1 = characters_dict.get(character_1)
             current_name_1 = currenct_dict_1.get("character_name")
             # Check that no words greater then 30 and name is not a number / number starting with letter and that at least 2 apperances
-            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1): # and currenct_dict_1.get("no_appearances") >= 2:
+            if currenct_dict_1.get("no_words") > 30 and not re.match("^\w?\d{1,4}\w?$",current_name_1) and currenct_dict_1.get("no_appearances") >= 2:
                 cleaned_characters_dict[current_name_1] = currenct_dict_1
                 total_speech_cleaned += currenct_dict_1.get("no_words")
             else:
@@ -915,12 +915,12 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/17-Again.txt") as file:
+    with open("../Data/scripts_text/Avengers,-The.txt") as file:
         text_file = file.read()
 
 
     # try:
-    test_script = Script(text_file,"17-Again.txt")
+    test_script = Script(text_file,"Avengers,-The.txt")
 
     print("Done!")
 
