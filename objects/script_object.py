@@ -39,6 +39,8 @@ class Script:
 
         # Created script info dict
         self.script_info_dict = {}
+        self.scene_dict = {}
+        self.character_dict = {}
 
         # Create arrays to hold different script object
         self.__speech_object_array = []
@@ -48,8 +50,9 @@ class Script:
         # Call array builder function
         self.__create_object_arrays_from_script()
 
-        # Finish building objects
+        # Finish building objects}
         self.__finish_building_objects()
+
 
         # Add data to script_info_dict if imdb data exists
         if self.imdb_dict != None:
@@ -191,7 +194,12 @@ class Script:
         for scene_ob in self.__scene_object_array:
             scene_ob.build_data_dict()
 
-        # Testing
+        count = 0
+        for scene_ob in self.__scene_object_array:
+            scene_dict = scene_ob.scene_info_dict
+            scene_no = "scene_" + str(count)
+            count += 1
+            self.scene_dict[scene_no] = scene_dict
 
 
     # Extract date from moive
@@ -228,6 +236,7 @@ class Script:
         no_cleaned_speech_words = character_dict.get("no_cleaned_speech_words")
         # Remove item form dict as causes errors
         del character_dict["no_cleaned_speech_words"]
+        # del character_dict["no_cleaned_speech_words"]
         # print(character_dict)
 
         # Character info
@@ -235,8 +244,10 @@ class Script:
         ### Character gender
         no_female_characters = 0
         female_words_spoken = 0
+
         no_male_characters = 0
         male_words_spoken = 0
+
         no_unknown_genders = 0
         unknown_gender_words = 0
 
@@ -316,17 +327,18 @@ class Script:
         # print(no_chars_speak_more_5_perent,no_chars_speak_more_10_perent,no_chars_speak_more_20_percent)
 
          # Average meta_critic score of actors
-        score_list = []
+        total_score = 0
+        count = 0
         for char in character_dict:
             # Average meta_critic score of actors
             score = (character_dict.get(char).get("meta_critic_score"))
-            if score != 0:
-                score_list.append(score)
+            if score != 0 and score is not None:
+                total_score += int(score)
+                count += 1
+
+        actor_average_meta_score = total_score / count
 
         ### Sentiment ###
-        average_speech_sentiment = 0
-        average_description_sentiment = 0
-        overall_sentiment = 0
 
         # Character sentiment
         no_characters_overall_positive = 0
@@ -341,34 +353,110 @@ class Script:
             elif sentiment == 0:
                 no_characters_overall_neutral += 1
 
+        # print(no_characters_overall_positive,no_characters_overall_negative,no_characters_overall_neutral)
 
-        actor_average_meta_score = sum(score_list) / len(score_list)
         # Percent of characters that where mapped
+        no_chars_not_mapped = no_unknown_genders
+        try:
+            percent_chars_not_mapped = no_chars_not_mapped / (len(character_dict))
+        except ZeroDivisionError:
+            percent_chars_not_mapped = 1
+        # print(percent_chars_not_mapped)
 
 
         # Analysis of sentiment throughout the movie
-        sentiment_plot_of_speech = 0
-        sentiment_plot_of_description = 0
-        overall_sentiment_plot = 0
+        sentiment_plot_of_speech = self.__return_sentiment_of_object_array(0.05,speech_array=1)
+        sentiment_plot_of_description = self.__return_sentiment_of_object_array(0.05,description_array=1)
+        overall_sentiment_plot = self.__return_sentiment_of_object_array(0.05,overall_plot=1)
 
-        # Top 5 character dicts
+        average_speech_sentiment = self.__average_of_non_zeros_in_array(sentiment_plot_of_speech)
+        average_description_sentiment = self.__average_of_non_zeros_in_array(sentiment_plot_of_description)
+        overall_sentiment = self.__average_of_non_zeros_in_array(overall_sentiment_plot)
 
-        print(character_dict)
+        # print(average_speech_sentiment,average_description_sentiment,overall_sentiment)
+
+
+        ### Top 5 character dicts by speech parts
+
+        # Generate list of characters and their % parts
+        speech_percent_array = []
+        for char in character_dict:
+            speech_percent_array.append([character_dict.get(char).get("character_name"),character_dict.get(char).get("percent_clean_speech")])
+
+        # Order list
+        speech_array_sorted = sorted(speech_percent_array, key=lambda x: x[1], reverse=True)
+        # print(speech_array_sorted)
+
+        stop_point = 5
+        if len(speech_array_sorted)< 5:
+            stop_point = len(speech_array_sorted)
+
+        # Add top 5 character dicts to dict
+        top_5_characters_dict = {}
+        # Add top 5 to dict
+        for i in range(0,stop_point):
+            top_5_characters_dict[speech_array_sorted[i][0]] = character_dict.get(speech_array_sorted[i][0])
+
+        # for char in top_5_characters_dict:
+        #     print(char,top_5_characters_dict.get(char))
+
+        # Actors scores
+        running_score = 0
+        non_zero_scores = 0
+        for char in top_5_characters_dict:
+            score = top_5_characters_dict.get(char).get("meta_critic_score")
+            if score != 0 and score is not None:
+                running_score += int(score)
+                non_zero_scores += 1
+
+        average_meta_critic_for_top_5 = running_score/non_zero_scores
 
         # Dict summaries for Scene
-        no_scenes = 0
-        no_discription_only_scene = 0
-        average_length_of_scenes = 0
+        no_scenes = len(self.__description_object_array)
+        no_description_only_scene = 0
+        no_mixed_scenes = no_scenes - no_description_only_scene
 
-        # Averages of speech words in different sections
+        average_length_array = []
+        no_scene_only_1_main_char = 0
+        no_scene_only_2_main_char = 0
+
+        # Cycle through scene
+        for scene in self.__scene_object_array:
+            scene_info_dict = scene.scene_info_dict
+
+            # Scene type
+            scene_only_description = scene_info_dict.get()
+            if scene_only_description == 1:
+                no_description_only_scene += 1
+
+            # Scene interaction type
+            scene_1_main = scene_info_dict.get()
+            scene_2_main = scene_info_dict.get()
+            if scene_1_main == 1:
+                no_scene_only_1_main_char += 1
+            elif scene_2_main == 1:
+                no_scene_only_2_main_char += 1
+
 
         # Categories of language used => adverbs / adjectives
+        language_analysis = TextWorker()
+
+        speech_language_dict = language_analysis.return_language_analysis_dict(self.return_string_of_all_speech())
+        description_language_dict = language_analysis.return_language_analysis_dict(self.return_string_all_discription())
 
         # No of unique non stop words => vocab measure
 
-        # Actors scores
-        score_top_5_actors = 0
 
+        ### Create character Dict
+        self.character_dict = character_dict
+        ## Create info dict
+
+        print(self.character_dict)
+        print(self.scene_dict)
+
+        self.info_dict = {
+
+        }
 
     def __add_scene_change_ob_to_array(self,text,count,change_to_outside):
 
@@ -607,6 +695,8 @@ class Script:
             # print(character_name_4,frequency_of_non_stop_words)
             # Insert information into dict
             current_dict_4["language_analysis_dict"] = language_analysis_dict
+
+            ### Not usefull at this point in time ###
             current_dict_4["freq_of_non_stop_words"] = frequency_of_non_stop_words
 
 
@@ -659,9 +749,9 @@ class Script:
 
         obj_return_array = []
 
-        range_objects = self.return_object_of_type_in_range(start=start_range,finish=finish_range,speech_normal_count=1)
+        rn_of_objects = self.return_object_of_type_in_range(start=start_range,finish=finish_range,speech_normal_count=1)
 
-        for obj in range_objects:
+        for obj in rn_of_objects:
             if obj.character == name:
                 obj_return_array.append(obj)
 
@@ -690,12 +780,36 @@ class Script:
 
         return average_sentiment
 
-    def __return_sentiment_of_object_array(self,object_array,ranges):
+    def __return_sentiment_of_object_array(self,range,speech_array=0,description_array=0,overall_plot=0):
 
         return_array = []
+        search_array = []
 
+        for i in np.arange(0,1,range):
+            start = i
+            finish = i + range
+            if speech_array == 1:
+                current_object_ran = self.return_object_of_type_in_range(start,finish,speech_normal_count=1)
+            elif description_array == 1:
+                current_object_ran = self.return_object_of_type_in_range(start,finish,discription=1)
+            elif overall_plot == 1:
+                current_object_ran = self.return_object_of_type_in_range(start,finish,speech_normal_count=1) + self.return_object_of_type_in_range(start,finish,discription=1)
+            else:
+                current_object_ran = []
 
+            non_zero_count = 0
+            running_total = 0
+            for ob in current_object_ran:
+                sent = ob.sentiment
+                if sent != 0:
+                    non_zero_count += 1
+                    running_total += sent
 
+            try:
+                section_sentiment = running_total / non_zero_count
+            except ZeroDivisionError:
+                section_sentiment = 0
+            return_array.append(section_sentiment)
 
         return return_array
 
@@ -770,6 +884,22 @@ class Script:
 
         return most_frequent_words
 
+    def __average_of_non_zeros_in_array(self,array):
+
+        total = 0
+        non_zero_count = 0
+
+        for i in array:
+            if i != 0:
+                total += i
+                non_zero_count += 1
+        try:
+            average = total / non_zero_count
+        except ZeroDivisionError:
+            average = 0
+
+        return average
+
     # This will attempt to capture the level of error that has occoured
     def generate_error_report(self):
         # Checks that at least 95 % of words make it into the object arrays.
@@ -787,12 +917,12 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/12-Years-a-Slave.txt") as file:
+    with open("../Data/scripts_text/17-Again.txt") as file:
         text_file = file.read()
 
 
     # try:
-    test_script = Script(text_file,"12-Years-a-Slave.txt")
+    test_script = Script(text_file,"17-Again.txt")
 
     print("Done!")
 
