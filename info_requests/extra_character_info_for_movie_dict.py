@@ -106,7 +106,7 @@ def scrape_and_format_page_info(imdb_code):
             # print(single_character.get("actor_name"),single_character.get("character_name_0"))
 
     character_dict['list_of_characters'] = list_of_characters
-    print(character_dict)
+    # print(character_dict)
     return character_dict
 
 def add_gender_and_meta_critic_info(character_dict): # Add extra info to the dicts. Using sqllite db to minimise number of calls
@@ -193,10 +193,10 @@ def combine_dicts_together(basic_dict,imdb_actor_info_dict):
                 script_character_name = script_character_name.split(" ")[0]
                 search_object = regex.search(r"!("+script_character_name+"){i<=1}!",character_string, regex.BESTMATCH)
 
-                print(search_object, script_character_name)
+                # print(search_object, script_character_name)
             if search_object == None: # Allow search for substring with deletions
                 search_object = regex.search(r"!("+script_character_name+"){d<=2}!",character_string , regex.BESTMATCH)
-                print(search_object, script_character_name, "3")
+                # print(search_object, script_character_name, "3")
 
 
         else:
