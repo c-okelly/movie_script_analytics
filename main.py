@@ -63,6 +63,13 @@ def main():
             failed_objects.append([file_name,E])
             count += 1
 
+        if count % 30:
+            pickle_file = "object_list_"+str(count)+".dat"
+
+            with open(pickle_file,"wb") as f:
+                pickle.dump(finished_objects,f)
+
+
     print(len(finished_objects))
     print(len(failed_objects))
     print(failed_objects)
