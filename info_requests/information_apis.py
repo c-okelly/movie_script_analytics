@@ -21,6 +21,7 @@ def imdb_data_call(movie):
 
     # request url
     request_url = "http://www.omdbapi.com/?t="+search_movie+"=&plot=short&r=json&tomatoes=true"
+    # print(request_url)
 
     #Request and get json file
     current_json_file = request.urlopen(request_url).read()
@@ -38,23 +39,23 @@ def imdb_data_call(movie):
         # Format awards for data set
         awards = move_data.get("Awards")
 
-        if len(awards) > 5:
-            try:
-                oscars = re.search("Won\s\d{1,2}\sOscar",awards).group().split(" ")[1] # Find string. Return match. Split on spaces. List item 1
-            except:
-                oscars = 0
-            try:
-                nom_oscars = re.search("Nominated for\s\d{1,2}\sOscar",awards).group().split(" ")[2]
-            except:
-                nom_oscars = 0
-            try:
-                wins = re.search("\s\d{1,4}\swin", awards).group().split(" ")[1]
-            except:
-                wins = 0
-            try:
-                nominations = re.search("\s\d{1,4}\snomination", awards).group().split(" ")[1]
-            except:
-                nominations = 0
+        # if len(awards) > 5:
+        try:
+            oscars = re.search("Won\s\d{1,2}\sOscar",awards).group().split(" ")[1] # Find string. Return match. Split on spaces. List item 1
+        except:
+            oscars = 0
+        try:
+            nom_oscars = re.search("Nominated for\s\d{1,2}\sOscar",awards).group().split(" ")[2]
+        except:
+            nom_oscars = 0
+        try:
+            wins = re.search("\s\d{1,4}\swin", awards).group().split(" ")[1]
+        except:
+            wins = 0
+        try:
+            nominations = re.search("\s\d{1,4}\snomination", awards).group().split(" ")[1]
+        except:
+            nominations = 0
 
         # Seperate out generes
         try:
@@ -149,7 +150,7 @@ def imdb_data_call(movie):
 
 
 if __name__ == '__main__':
-    x =imdb_data_call("Mad Max: Fury Road")
-    y =imdb_data_call("Jungle book")
+    x =imdb_data_call("Candle-to-Water")
+    # y =imdb_data_call("Jungle book")
     print(x)
 
