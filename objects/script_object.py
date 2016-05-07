@@ -60,7 +60,7 @@ class Script:
         else:
             raise MoveDataNotFound(movie_file_name)
 
-        print("\nScript object ",movie_file_name,"has succesfully finished (printing from script init)")
+        print("\nScript object",movie_file_name,"has successfully finished (printing from script init)")
 
         # Testing
         # print(len(self.__speech_object_array),len(self.__description_object_array),len(self.__scene_object_array))
@@ -107,12 +107,11 @@ class Script:
 
             ### Scene Change
             # Check first line to see if its all upper case => scene change => ext
-            if text_section.split("\n")[0].isupper() and (re.search('\s{0,3}EXT\.', text_section)):
+            if text_section.split("\n")[0].isupper() and ((re.search('\s{0,3}EXT\.', text_section)) or (re.search('\s{0,3}EXTERIOR\s', text_section))):
                 self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=1)
 
-
             # Check first line to see if its all upper case => scene change => int
-            elif (text_section.split("\n")[0].isupper() and re.search('\s{0,3}INT\.', text_section)):
+            elif (text_section.split("\n")[0].isupper() and (re.search('\s{0,3}INT\.', text_section) or re.search('\s{0,3}INTERIOR\s', text_section))):
                 self.__add_scene_change_ob_to_array(text_section,percentage_count,change_to_outside=0)
 
             ### Speech
@@ -447,8 +446,10 @@ class Script:
 
         # Categories of language used => adverbs / adjectives
         language_analysis = TextWorker()
+        print(self.return_string_of_all_speech())
 
         speech_language_dict = language_analysis.return_language_analysis_dict(self.return_string_of_all_speech())
+        print(speech_language_dict)
         description_language_dict = language_analysis.return_language_analysis_dict(self.return_string_all_discription())
 
         # No of unique non stop words => vocab measure
@@ -991,7 +992,8 @@ if __name__ == '__main__':
     test_script = Script(text_file,"12.txt")
 
     print("Done!")
-
+    print(test_script.info_dict.get("speech_language_dict"))
+    print(test_script.info_dict.get("description_language_dict"))
     # except Exception as e:
     #     print(e)
     #     print("Error")
