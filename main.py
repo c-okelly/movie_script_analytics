@@ -33,8 +33,14 @@ def main():
     ### Go through files and build speech object and add to array to be pickled.
     ###  If error save error message and add to not not finished array
 
-    count = 1
-    for file in cleaned_list:
+
+    start_range = 0
+    finished_range = 200
+    count = start_range
+
+    print(start_range,finished_range)
+    print(len(cleaned_list))
+    for file in cleaned_list[start_range:finished_range]:
 
         file_name = file
         # If failure catch error. Add file to list and continue on
