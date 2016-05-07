@@ -991,8 +991,8 @@ if __name__ == '__main__':
     test_script = Script(text_file,"Alien-Nation.txt")
 
     print("Done!")
-    print(test_script.info_dict.get("speech_language_dict"))
-    print(test_script.info_dict.get("description_language_dict"))
+    print(test_script.script_info_dict)
+    # print(test_script.info_dict.get("description_language_dict"))
     # except Exception as e:
     #     print(e)
     #     print("Error")

@@ -93,9 +93,17 @@ def imdb_data_call(movie):
         # Turn released date into only year
         try:
             released = move_data.get("Released").split()
+        except:
+            released = None
+        try:
             release_year = released[2]
+        except:
+            release_year = None
+        try:
             release_month = released[1]
         except:
+            release_month = None
+
             pass
         # Convert run time into mins only
         try:

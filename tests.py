@@ -70,7 +70,9 @@ if __name__ == '__main__':
     # array= [1,3,5,6,1]
     #
     # count = 0
-    var = pickle.load(open("Data/object_list_30.dat","rb"))
+    var = pickle.load(open("Data/Pickled_objects/400.dat","rb"))
+    object_1 = var[0]
+    print(object_1.info_dict)
 
 
 
