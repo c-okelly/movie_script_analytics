@@ -48,7 +48,7 @@ def main():
             finished_objects.append(current_script_object)
 
             # Error messages
-            print("count",count,".","Chats words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
+            print("count"+str(count)+". Chars words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
             print("Total words",current_script_object.info_dict.get("total_words"),"speech,",current_script_object.info_dict.get("percent_speech"),". Description",current_script_object.info_dict.get("percent_description"))
             print("IMDB code is ", current_script_object.info_dict.get("imdb_code"))
             count += 1
@@ -57,6 +57,7 @@ def main():
             print("The IMDB could not be found for ", file_name)
             failed_objects.append([file_name,"IMDB dict failure"])
             count += 1
+
         except Exception as E:
             print("File ",file_name,"could not be converted into an ojbect. Error was ",E)
             failed_objects.append([file_name,E])
