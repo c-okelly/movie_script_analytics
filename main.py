@@ -34,8 +34,8 @@ def main():
     ###  If error save error message and add to not not finished array
 
 
-    start_range = 0
-    finished_range = 200
+    start_range = 1000
+    finished_range = 1100
     count = start_range
 
     print(start_range,finished_range)
@@ -83,7 +83,8 @@ def main():
     print(failed_objects)
 
     # Pickle list
-    pickle_file = "Data/Pickled_objects/object_list.dat"
+    name = "Data/Pickled_objects/" + str(count) + ".dat"
+    pickle_file = name
 
     with open(pickle_file,"wb") as f:
         pickle.dump(finished_objects,f)

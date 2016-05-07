@@ -2,6 +2,7 @@ import re
 
 import text_objects
 import numpy as np
+import pickle
 
 # f = open("Data/scripts_text/17-Again.txt", 'r')
 # text = f.read()
@@ -66,7 +67,10 @@ if __name__ == '__main__':
     # for i in np.arange(0,1,0.1):
     #     print(i,"to",i+0.1)
 
-    array= [1,3,5,6,1]
+    # array= [1,3,5,6,1]
+    #
+    # count = 0
+    var = pickle.load(open("Data/object_list_30.dat","rb"))
 
-    count = 0
+
 
