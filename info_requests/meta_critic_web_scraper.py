@@ -63,8 +63,11 @@ def retieve_person_score(search_name):
         else:
             print(err.code + "error for search term => " + search_name)
         return 0
+
     except:
-        raise MetaCriticRequestFailed(search_name)
+        return 0
+        pass
+        # raise MetaCriticRequestFailed(search_name)
 
 
 if __name__ == '__main__':

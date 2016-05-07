@@ -983,12 +983,12 @@ class Script:
         return words_captured
 
 if __name__ == '__main__':
-    with open("../Data/scripts_text/12.txt") as file:
+    with open("../Data/scripts_text/Alien-Nation.txt") as file:
         text_file = file.read()
 
 
     # try:
-    test_script = Script(text_file,"12.txt")
+    test_script = Script(text_file,"Alien-Nation.txt")
 
     print("Done!")
     print(test_script.info_dict.get("speech_language_dict"))

@@ -33,7 +33,7 @@ def main():
     ### Go through files and build speech object and add to array to be pickled.
     ###  If error save error message and add to not not finished array
 
-    count = 0
+    count = 1
     for file in cleaned_list:
 
         file_name = file
@@ -49,25 +49,27 @@ def main():
 
             # Error messages
             print("count "+str(count)+". Chars words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
-            print("Total words",current_script_object.info_dict.get("total_words"),"speech,",current_script_object.info_dict.get("percent_speech"),". Description",current_script_object.info_dict.get("percent_description"))
+            print("Total words",str(current_script_object.info_dict.get("total_words"))+". Speech,"+ str(current_script_object.info_dict.get("percent_speech"))+". Description " + str(current_script_object.info_dict.get("percent_description")))
             print("IMDB code is ", current_script_object.info_dict.get("imdb_code"))
             count += 1
 
         except MoveDataNotFound:
-            print("The IMDB could not be found for ", file_name)
+            print("\nThe IMDB could not be found for ", file_name)
             failed_objects.append([file_name,"IMDB dict failure"])
             count += 1
 
         except Exception as E:
-            print("File ",file_name,"could not be converted into an ojbect. Error was ",E)
+            print("\nFile",file_name,"could not be converted into an ojbect. Error was ",E)
             failed_objects.append([file_name,E])
             count += 1
 
-        if count % 30:
-            pickle_file = "object_list_"+str(count)+".dat"
+        if count % 30 == 0:
+            pickle_file = "Data/Pickled_objects/object_list_"+str(count)+".dat"
 
             with open(pickle_file,"wb") as f:
                 pickle.dump(finished_objects,f)
+
+            finished_objects = []
 
 
     print(len(finished_objects))
@@ -75,7 +77,7 @@ def main():
     print(failed_objects)
 
     # Pickle list
-    pickle_file = "object_list.dat"
+    pickle_file = "Data/Pickled_objects/object_list.dat"
 
     with open(pickle_file,"wb") as f:
         pickle.dump(finished_objects,f)
