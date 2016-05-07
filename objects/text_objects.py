@@ -41,7 +41,7 @@ class TextBasedSection:
 
         return average_sentiment
 
-    def return_language_analysis_dict(self,string_to_be_analysed):
+    def return_language_analysis_dict(self,string_to_be_analysed,basic_type=0):
 
         language_dict = {}
 
@@ -59,6 +59,52 @@ class TextBasedSection:
             else:
                 language_dict[tagged_word[1]] = 1
 
+        # Summarise dict into broader categories
+        summary_dict = {"noun":0,"pronoun":0,"verb":0,"adverbs":0,"adjectives":0,"interjection":0,"conjunction":0,"determiner":0,"other":0}
+
+        # print(language_dict)
+        for word_type in language_dict:
+            # Exclude pos_tagger as is list
+            if word_type != "pos_tagger_used":
+                # Word count
+                word_count = language_dict.get(word_type)
+                # print(word_type,word_count)
+
+                # Noun
+                if word_type == "NN" or word_type == "NNS" or word_type == "NNP" or word_type == "NNPS":
+                    summary_dict["noun"] += language_dict.get(word_type)
+                # Pronoun
+                elif word_type == "PRP" or word_type == "PRP$" or word_type == "WP" or word_type == "WP$":
+                    summary_dict["pronoun"] += language_dict.get(word_type)
+                # Verb
+                elif word_type == "VB" or word_type == "VBD" or word_type == "VBG" or word_type == "VBN" or word_type == "VBP" or word_type == "VBZ":
+                    summary_dict["verb"] += language_dict.get(word_type)
+
+                # Adverbs
+                elif word_type == "RB" or word_type == "RBR" or word_type == "RBS" or word_type == "WRB":
+                    summary_dict["adverbs"] += language_dict.get(word_type)
+
+                # Adjectives
+                elif word_type == "JJ" or word_type == "JJR" or word_type == "JJR":
+                    summary_dict["adjectives"] += language_dict.get(word_type)
+                # Interjection
+                elif word_type == "UH":
+                    summary_dict["interjection"] += language_dict.get(word_type)
+                # Conjunection
+                elif word_type == "CC" or word_type == "IN":
+                    summary_dict["conjunction"] += language_dict.get(word_type)
+                # Determiner
+                elif word_type == "DT" or word_type == "WDT" or word_type == "PDT":
+                    summary_dict["determiner"] += language_dict.get(word_type)
+                # Punctuation => ignore
+                elif word_type == ")" or word_type == "." or word_type == "$" or word_type =="#" or word_type == "''" or word_type == ":" or word_type == "," or  word_type == "(" or word_type == "``":
+                    pass
+                # Other
+                else:
+                    # print(word_type)
+                    summary_dict["other"] += language_dict.get(word_type)
+
+
         # print(token_text, "\n")
         # print(nltk.help.upenn_tagset())
 
@@ -66,7 +112,10 @@ class TextBasedSection:
         # key_explanations = {'CC':'Coordinating conjunction'},{'CD':'Cardinal number'},{'DT':'Determiner'},{'EX':'Existential there'},{'FW':'Foreign word'},{'IN':'Preposition or subordinating conjunction'},{'JJ':'Adjective'},{'JJR':'Adjective, comparative'},{'JJS':'Adjective, superlative'},{'LS':'List item marker'},{'MD':'Modal'},{'NN':'Noun, singular or mass'},{'NNS':'Noun, plural'},{'NNP':'Proper noun, singular'},{'NNPS':'Proper noun, plural'},{'PDT':'Predeterminer'},{'POS':'Possessive ending'},{'PRP':'Personal pronoun'},{'PRP$':'Possessive pronoun'},{'RB':'Adverb'},{'RBR':'Adverb, comparative'},{'RBS':'Adverb, superlative'},{'RP':'Particle'},{'SYM':'Symbol'},{'TO':'to'},{'UH':'Interjection'},{'VB':'Verb, base form'},{'VBD':'Verb, past tense'},{'VBG':'Verb, gerund or present participle'},{'VBN':'Verb, past participle'},{'VBP':'Verb, non-d person singular present'},{'VBZ':'Verb, d person singular present'},{'WDT':'Wh-determiner'},{'WP':'Wh-pronoun'},{'WP$':'Possessive wh-pronoun'},{'WRB':'Wh-adverb'}
         # language_dict["key_explanations"] = key_explanations
 
-        return language_dict
+        if basic_type == 0:
+            return summary_dict
+        else:
+            return language_dict
 
 
 class Speech(TextBasedSection):

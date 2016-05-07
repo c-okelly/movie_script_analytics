@@ -48,7 +48,7 @@ def main():
             finished_objects.append(current_script_object)
 
             # Error messages
-            print("count"+str(count)+". Chars words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
+            print("count "+str(count)+". Chars words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
             print("Total words",current_script_object.info_dict.get("total_words"),"speech,",current_script_object.info_dict.get("percent_speech"),". Description",current_script_object.info_dict.get("percent_description"))
             print("IMDB code is ", current_script_object.info_dict.get("imdb_code"))
             count += 1
