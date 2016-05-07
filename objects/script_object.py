@@ -47,18 +47,20 @@ class Script:
         self.__description_object_array = []
         self.__scene_object_array = []
 
-        # Call array builder function
-        self.__create_object_arrays_from_script()
 
-        # Finish building objects}
-        self.__finish_building_objects()
-
-
-        # Add data to script_info_dict if imdb data exists
         if self.imdb_dict != None:
-            self.__extract_data_from_movie()
+            # Call array builder function
+            self.__create_object_arrays_from_script()
 
-        print("Script object ",movie_file_name,"has succesfully finished")
+            # Finish building objects}
+            self.__finish_building_objects()
+
+            # Add data to script_info_dict if imdb data exists
+            self.__extract_data_from_movie()
+        else:
+            raise MoveDataNotFound(movie_file_name)
+
+        print("\nScript object ",movie_file_name,"has succesfully finished (printing from script init)")
 
         # Testing
         # print(len(self.__speech_object_array),len(self.__description_object_array),len(self.__scene_object_array))
@@ -460,14 +462,14 @@ class Script:
         # print(self.scene_dict)
 
         self.info_dict = {"total_words":total_words,
-                          "tota_caputred_words":total_captured_words,
+                          "total_caputred_words":total_captured_words,
                           "no_speech_words":no_speech_words,
                           "no_description_words":no_descritption_words,
                           "no_scene_change_words":no_scene_change_words,
                           "no_significant_char_words_per_mins":no_significant_char_speech_words,
                           # Percentages
                           "percent_speech":percent_of_speech,
-                          "percent_descriptoin":percent_of_description,
+                          "percent_description":percent_of_description,
                           # WPM
                           "words_per_min":gen_words_per_min,
                           "speech_wpm":speech_words_per_min,

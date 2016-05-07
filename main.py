@@ -46,7 +46,11 @@ def main():
             current_script_object = script_object.Script(current_text_file,file_name)
             # Add object to array
             finished_objects.append(current_script_object)
-            print(count)
+
+            # Error messages
+            print("count",count,".","Chats words not mapped to char =>",current_script_object.info_dict.get("percent_unknown_words"))
+            print("Total words",current_script_object.info_dict.get("total_words"),"speech,",current_script_object.info_dict.get("percent_speech"),". Description",current_script_object.info_dict.get("percent_description"))
+            print("IMDB code is ", current_script_object.info_dict.get("imdb_code"))
             count += 1
 
         except MoveDataNotFound:
