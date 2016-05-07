@@ -446,10 +446,9 @@ class Script:
 
         # Categories of language used => adverbs / adjectives
         language_analysis = TextWorker()
-        print(self.return_string_of_all_speech())
+        # print(self.return_string_of_all_speech())
 
         speech_language_dict = language_analysis.return_language_analysis_dict(self.return_string_of_all_speech())
-        print(speech_language_dict)
         description_language_dict = language_analysis.return_language_analysis_dict(self.return_string_all_discription())
 
         # No of unique non stop words => vocab measure
