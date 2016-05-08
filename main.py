@@ -196,15 +196,44 @@ def retry_imdb_with_new_serach_term(input_list):
     with open(pickle_file,"wb") as f:
         pickle.dump(finished_objects,f)
 
+def collect_all_pickled_file_and_create_sinlge_one():
+     # Find all files in directory and run them through clean_html_and_save_to_file
+    save_location = "Data/Pickled_objects/"
+    list_all_files = os.listdir(save_location)
+    # Clean list
+    cleaned_list = [file_name for file_name in list_all_files if file_name[0] != "."]
+
+    all_objects_array = []
+
+    file_count = 0
+    # Unpickle files and insert into array
+    for file in cleaned_list:
+        file_path = save_location + file
+        current_object_array = pickle.load((open(file_path,"rb")))
+        all_objects_array += current_object_array
+        file_count += len(current_object_array)
+        # print(file_count,file)
+
+    # print(file_count)
+    print(all_objects_array)
+    print(len(all_objects_array))
+
+    # Repickle long list into single file and save in main directory
+    save_name_locaiton = "Data/all_converted_objects.dat"
+
+    with open(save_name_locaiton,"wb") as f:
+        pickle.dump(all_objects_array,f)
+
 
 if __name__ == '__main__':
     # main()
 
-    # failed_object_arrays = [["Dave-Barry's-Complete-Guide-to-Guys.txt", 'IMDB dict failure'], ['Dry-White-Season,-A.txt', 'IMDB dict failure'], ['Ed-TV.txt', 'IMDB dict failure'], ['Evil-Dead-II-Dead-by-Dawn.txt', 'IMDB dict failure'], ['Fright-Night-(1985).txt', 'IMDB dict failure'], ['Frozen-(Disney).txt', 'IMDB dict failure'], ['Adventures-of-Buckaroo-Banzai-Across-the-Eighth-Dimension,-The.txt', 'IMDB dict failure'], ['Airplane-2-The-Sequel.txt', 'IMDB dict failure'], ['Alien-3.txt', 'IMDB dict failure'], ['American-Shaolin-King-of-Kickboxers-II.txt', 'IMDB dict failure'], ["Avventura,-L'-(The-Adventure).txt", 'IMDB dict failure'], ['Batman-2.txt', 'IMDB dict failure'], ['Blast-from-the-Past,-The.txt', 'IMDB dict failure'], ['Boondock-Saints-2-All-Saints-Day.txt', 'IMDB dict failure'], ['ghost_ship_info.txt', 'IMDB dict failure'], ['Ghostbusters-2.txt', 'IMDB dict failure'], ['Glengarry-Glen-Gross.txt', 'IMDB dict failure'], ['Grosse-Point-Blank.txt', 'IMDB dict failure'], ['Harold-and-Kumar-Go-to-White-Castle.txt', 'IMDB dict failure'], ['Hellboy-2-The-Golden-Army.txt', 'IMDB dict failure'], ['Hellraiser-3-Hell-on-Earth.txt', 'IMDB dict failure'], ['index.txt', 'IMDB dict failure'], ['Indiana-Jones-and-the-Raiders-of-the-Lost-Ark.txt', 'IMDB dict failure'], ['Indiana-Jones-IV.txt', 'IMDB dict failure'], ['Jennifer-Eight.txt', 'IMDB dict failure'], ['Jurassic-Park-The-Lost-World.txt', AttributeError("'NoneType' object has no attribute 'findAll'",)], ['Kill-Bill-Volume-1-&-2.txt', 'IMDB dict failure'], ['Rambo-First-Blood-II-The-Mission.txt', 'IMDB dict failure'], ['Return-of-the-Apes.txt', 'IMDB dict failure'], ['Sandlot-Kids,-The.txt', 'IMDB dict failure'], ['Spare-Me.txt', 'IMDB dict failure'], ['Star-Wars-A-New-Hope.txt', 'IMDB dict failure'], ['Star-Wars-Attack-of-the-Clones.txt', 'IMDB dict failure'], ['Star-Wars-Return-of-the-Jedi.txt', 'IMDB dict failure'], ['Star-Wars-Revenge-of-the-Sith.txt', 'IMDB dict failure'], ['Star-Wars-The-Empire-Strikes-Back.txt', 'IMDB dict failure'], ['Star-Wars-The-Force-Awakens.txt', 'IMDB dict failure'], ['Star-Wars-The-Phantom-Menace.txt', 'IMDB dict failure'], ['Stuntman,-The.txt', 'IMDB dict failure'], ['Sugar.txt', AttributeError("'NoneType' object has no attribute 'getText'",)], ['Terminator-2-Judgement-Day.txt', 'IMDB dict failure'], ['Three-Kings-(Spoils-of-War).txt', 'IMDB dict failure'], ['White-Jazz.txt', 'IMDB dict failure'], ['Withnail-and-I.txt', 'IMDB dict failure']]
+    failed_object_arrays = [["Dave-Barry's-Complete-Guide-to-Guys.txt", 'IMDB dict failure'], ['Dry-White-Season,-A.txt', 'IMDB dict failure'], ['Ed-TV.txt', 'IMDB dict failure'], ['Evil-Dead-II-Dead-by-Dawn.txt', 'IMDB dict failure'], ['Fright-Night-(1985).txt', 'IMDB dict failure'], ['Frozen-(Disney).txt', 'IMDB dict failure'], ['Adventures-of-Buckaroo-Banzai-Across-the-Eighth-Dimension,-The.txt', 'IMDB dict failure'], ['Airplane-2-The-Sequel.txt', 'IMDB dict failure'], ['Alien-3.txt', 'IMDB dict failure'], ['American-Shaolin-King-of-Kickboxers-II.txt', 'IMDB dict failure'], ["Avventura,-L'-(The-Adventure).txt", 'IMDB dict failure'], ['Batman-2.txt', 'IMDB dict failure'], ['Blast-from-the-Past,-The.txt', 'IMDB dict failure'], ['Boondock-Saints-2-All-Saints-Day.txt', 'IMDB dict failure'], ['ghost_ship_info.txt', 'IMDB dict failure'], ['Ghostbusters-2.txt', 'IMDB dict failure'], ['Glengarry-Glen-Gross.txt', 'IMDB dict failure'], ['Grosse-Point-Blank.txt', 'IMDB dict failure'], ['Harold-and-Kumar-Go-to-White-Castle.txt', 'IMDB dict failure'], ['Hellboy-2-The-Golden-Army.txt', 'IMDB dict failure'], ['Hellraiser-3-Hell-on-Earth.txt', 'IMDB dict failure'], ['index.txt', 'IMDB dict failure'], ['Indiana-Jones-and-the-Raiders-of-the-Lost-Ark.txt', 'IMDB dict failure'], ['Indiana-Jones-IV.txt', 'IMDB dict failure'], ['Jennifer-Eight.txt', 'IMDB dict failure'], ['Jurassic-Park-The-Lost-World.txt', AttributeError("'NoneType' object has no attribute 'findAll'",)], ['Kill-Bill-Volume-1-&-2.txt', 'IMDB dict failure'], ['Rambo-First-Blood-II-The-Mission.txt', 'IMDB dict failure'], ['Return-of-the-Apes.txt', 'IMDB dict failure'], ['Sandlot-Kids,-The.txt', 'IMDB dict failure'], ['Spare-Me.txt', 'IMDB dict failure'], ['Star-Wars-A-New-Hope.txt', 'IMDB dict failure'], ['Star-Wars-Attack-of-the-Clones.txt', 'IMDB dict failure'], ['Star-Wars-Return-of-the-Jedi.txt', 'IMDB dict failure'], ['Star-Wars-Revenge-of-the-Sith.txt', 'IMDB dict failure'], ['Star-Wars-The-Empire-Strikes-Back.txt', 'IMDB dict failure'], ['Star-Wars-The-Force-Awakens.txt', 'IMDB dict failure'], ['Star-Wars-The-Phantom-Menace.txt', 'IMDB dict failure'], ['Stuntman,-The.txt', 'IMDB dict failure'], ['Sugar.txt', AttributeError("'NoneType' object has no attribute 'getText'",)], ['Terminator-2-Judgement-Day.txt', 'IMDB dict failure'], ['Three-Kings-(Spoils-of-War).txt', 'IMDB dict failure'], ['White-Jazz.txt', 'IMDB dict failure'], ['Withnail-and-I.txt', 'IMDB dict failure']]
+    # print(len(failed_object_arrays))
+    # file_directory = "Data/scripts_text/"
+    # object_save = "Data/Pickled_objects/"
+    # file_name = "8MM.txt"
+    #
+    # run_individual_file(file_directory,object_save,file_name)
 
-    file_directory = "Data/scripts_text/"
-    object_save = "Data/Pickled_objects/"
-    file_name = "8MM.txt"
-
-    run_individual_file(file_directory,object_save,file_name)
-
+    # collect_all_pickled_file_and_create_sinlge_one()
