@@ -8,7 +8,7 @@ import pickle, os
 import script_object
 from script_object import MoveDataNotFound
 import Data_phraser
-import sys, traceback
+import sys
 
 def main():
 
@@ -223,7 +223,6 @@ def collect_all_pickled_file_and_create_sinlge_one():
 
     with open(save_name_locaiton,"wb") as f:
         pickle.dump(all_objects_array,f)
-
 
 if __name__ == '__main__':
     # main()
