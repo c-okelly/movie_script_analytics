@@ -6,7 +6,7 @@ Each object will the run functions of the script to generate data from it.
 This results can then be called by attributes to be put into a csv document
 """
 
-from text_objects import Speech,Scene_change,Discription,TextWorker
+from text_objects import Speech,Scene_change,Discription,TextBasedSection
 from information_apis import imdb_data_call
 import re
 import operator
@@ -445,11 +445,11 @@ class Script:
 
 
         # Categories of language used => adverbs / adjectives
-        language_analysis = TextWorker()
+
         # print(self.return_string_of_all_speech())
 
-        speech_language_dict = language_analysis.return_language_analysis_dict(self.return_string_of_all_speech())
-        description_language_dict = language_analysis.return_language_analysis_dict(self.return_string_all_discription())
+        speech_language_dict = TextBasedSection.return_language_analysis_dict(self.return_string_of_all_speech())
+        description_language_dict = TextBasedSection.return_language_analysis_dict(self.return_string_all_discription())
 
         # No of unique non stop words => vocab measure
 
@@ -745,7 +745,6 @@ class Script:
         ### Text analysis of each character, no of unique non stop words => vocb, average sentence length
 
         # Create analysis function
-        analysis_object = TextWorker()
 
         for character_4 in cleaned_characters_dict:
             current_dict_4 = cleaned_characters_dict.get(character_4)
@@ -753,7 +752,7 @@ class Script:
             # Get character string
             character_string_4 = self.__get_string_character_speech(character_name_4)
             # Get language analysis dict
-            language_analysis_dict = analysis_object.return_language_analysis_dict(character_string_4)
+            language_analysis_dict = TextBasedSection.return_language_analysis_dict(character_string_4)
 
             # Carry out frequency dist calculation
             frequency_of_non_stop_words = self.__word_count_analysis(character_string_4)
