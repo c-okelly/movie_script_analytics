@@ -419,7 +419,11 @@ class Script:
             average_meta_critic_for_top_5 = 0
 
         # Dict summaries for Scene
+
+        ## Does not return logically correct results
         no_scenes = len(self.__description_object_array)
+        # print(self.__description_object_array)
+        # print(no_scenes)
         no_description_only_scene = 0
         no_mixed_scenes = no_scenes - no_description_only_scene
 
@@ -991,7 +995,7 @@ if __name__ == '__main__':
     test_script = Script(text_file,"Alien-Nation.txt")
 
     print("Done!")
-    print(test_script.script_info_dict)
+    print(test_script.scene_dict)
     # print(test_script.info_dict.get("description_language_dict"))
     # except Exception as e:
     #     print(e)
